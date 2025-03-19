@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import fetchWithToken from "./fetchWithToken";
 import { useLogout } from "./useLogout";
 
-// const BASE_URL = "http://localhost:3000/";
 
 const useAuth = () => {
   const navigate = useNavigate();

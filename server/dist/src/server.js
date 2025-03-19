@@ -1,6 +1,4 @@
 "use strict";
-// // Tom-Guter-316487230
-// // Hodaya-Karo-322579848
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -23,13 +21,30 @@ const cors_1 = __importDefault(require("cors"));
 const commentsOnCharger_route_1 = __importDefault(require("./routes/commentsOnCharger_route"));
 const user_route_1 = __importDefault(require("./routes/user_route"));
 const car_data_route_1 = __importDefault(require("./routes/car_data_route"));
+const admin_route_1 = __importDefault(require("./routes/admin_route"));
 const book_a_charger_route_1 = __importDefault(require("./routes/book_a_charger_route"));
 const swagger_jsdoc_1 = __importDefault(require("swagger-jsdoc"));
 const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
 const gemini_route_1 = __importDefault(require("./routes/gemini_route"));
+const fs_1 = __importDefault(require("fs"));
+const path_1 = __importDefault(require("path"));
 const app = (0, express_1.default)();
 dotenv_1.default.config();
-app.use((0, cors_1.default)());
+app.use((0, cors_1.default)({
+    origin: 'http://localhost:5173',
+    credentials: true,
+}));
+const ensureUploadDirectories = () => {
+    const directories = ["uploads"];
+    directories.forEach((dir) => {
+        const fullPath = path_1.default.resolve(__dirname, dir);
+        if (!fs_1.default.existsSync(fullPath)) {
+            fs_1.default.mkdirSync(fullPath, { recursive: true });
+        }
+    });
+};
+ensureUploadDirectories();
+app.use("/uploads", express_1.default.static(path_1.default.resolve(__dirname, "uploads")));
 const options = {
     definition: {
         openapi: "3.0.0",
@@ -64,6 +79,7 @@ const moduleApp = () => __awaiter(void 0, void 0, void 0, function* () {
     app.use("/gemini", gemini_route_1.default);
     app.use("/bookings", book_a_charger_route_1.default);
     app.use("/carData", car_data_route_1.default);
+    app.use("/admin", admin_route_1.default);
     return app;
 });
 exports.default = moduleApp;

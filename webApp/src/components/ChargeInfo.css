@@ -1,29 +1,51 @@
-.charge-container {
-  margin: 20px auto;
-  padding: 10px;
-}
-
 .table-container {
   margin: 0 auto;
-  border-radius: 8px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
   overflow: auto;
+  max-height: 400px;
+  position: relative;
+}
+
+.table-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.table-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 
 .table-title {
   text-align: center;
-  margin: 15px 0;
-  font-weight: bold;
-  color: #1976d2;
+  margin: 0;
+  padding: 15px 0;
+  font-weight: bolder;
+  color: #000000;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: white;
 }
 
 .table-header-row {
   background-color: #f4f6f8;
+  position: sticky;
+  top: 53px;
+  z-index: 1;
 }
 
 .table-header-cell {
   font-weight: bold;
   color: black !important;
+  background-color: #f4f6f8;
 }
 
 .table-cell {
@@ -49,22 +71,47 @@
 }
 
 .schedule-btn.edit-btn {
-  background-color: #1976d2;
+  background-color: #000000;
   color: #fff;
+}
+
+.schedule-btn.edit-btn:hover {
+  background-color: #333333;
+  transform: scale(1.05);
+}
+
+.schedule-btn.delete-btn {
+  background-color: #be0b1d;
+  color: #fff;
+}
+
+.schedule-btn.delete-btn:hover {
+  background-color: #9c0917;
+  transform: scale(1.05);
 }
 
 .schedule-btn.save-btn {
-  background-color: #28a745;
+  background-color: #000000;
   color: #fff;
+}
+
+.schedule-btn.save-btn:hover {
+  background-color: #333333;
+  transform: scale(1.05);
 }
 
 .schedule-btn.cancel-btn {
-  background-color: #dc3545;
+  background-color: #be0b1d;
   color: #fff;
 }
 
-.schedule-btn:hover {
+.schedule-btn.cancel-btn:hover {
+  background-color: #9c0917;
   transform: scale(1.05);
+}
+
+.MuiButton-root:hover {
+  background-color: inherit !important;
 }
 
 .file-upload-input {

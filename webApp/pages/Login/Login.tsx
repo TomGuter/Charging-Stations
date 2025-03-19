@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./Login.module.css";
-import { GoogleLogin } from '@react-oauth/google';
-import { CredentialResponse } from '@react-oauth/google';
+import { GoogleLogin } from "@react-oauth/google";
+import { CredentialResponse } from "@react-oauth/google";
+
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -14,7 +15,7 @@ const LoginPage: React.FC = () => {
     const accessToken = localStorage.getItem("accessToken");
 
     if (accessToken) {
-      navigate("/Home"); 
+      navigate("/Home");
     }
   }, [navigate]);
 
@@ -47,12 +48,12 @@ const LoginPage: React.FC = () => {
       return;
     }
 
-    setError(""); 
+    setError("");
 
     const loginData = { email, password };
 
     try {
-      const response = await fetch("http://localhost:3000/auth/login", {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -68,31 +69,36 @@ const LoginPage: React.FC = () => {
 
       localStorage.setItem("accessToken", data.accessToken);
       localStorage.setItem("refreshToken", data.refreshToken);
-      localStorage.setItem('userId', data._id);
+      localStorage.setItem("userId", data._id);
       localStorage.setItem("firstName", data.firstName);
       localStorage.setItem("lastName", data.lastName);
       localStorage.setItem("email", data.email);
       localStorage.setItem("picture", data.picture);
-      
-      navigate("/Home"); 
+
+      navigate("/Home");
     } catch (error) {
       console.error("Error:", error);
       setError("Login failed. Please check your credentials.");
     }
   };
 
-  const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
+  const handleGoogleSuccess = async (
+    credentialResponse: CredentialResponse
+  ) => {
     try {
-      const response = await fetch("http://localhost:3000/auth/logInWithGoogle", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          idToken: credentialResponse.credential,
-          password: Math.random().toString(36).slice(-8),
-        }),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/auth/logInWithGoogle`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            idToken: credentialResponse.credential,
+            password: Math.random().toString(36).slice(-8),
+          }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Google login failed");
@@ -102,7 +108,7 @@ const LoginPage: React.FC = () => {
 
       localStorage.setItem("accessToken", data.accessToken);
       localStorage.setItem("refreshToken", data.refreshToken);
-      localStorage.setItem('userId', data.user.id);
+      localStorage.setItem("userId", data.user.id);
       localStorage.setItem("firstName", data.user.firstName);
       localStorage.setItem("lastName", data.user.lastName);
 
@@ -129,14 +135,14 @@ const LoginPage: React.FC = () => {
             placeholder="Enter your email"
             className={styles.input}
             value={email}
-            onChange={handleEmailChange} 
+            onChange={handleEmailChange}
           />
           <input
             type="password"
             placeholder="Enter your password"
             className={styles.input}
             value={password}
-            onChange={(e) => setPassword(e.target.value)} 
+            onChange={(e) => setPassword(e.target.value)}
           />
           <button className={styles.button} type="submit">
             Login

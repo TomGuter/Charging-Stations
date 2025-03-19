@@ -16,7 +16,6 @@ const router = Router();
 
 
 
-
 /**
  * @swagger
  * components:
@@ -26,15 +25,52 @@ const router = Router();
  *       required:
  *         - text
  *       properties:
+ *         userId:
+ *           type: string
+ *           description: The ID of the user who made the comment.
+ *           example: "60d0fe4f5311236168a109ca"
  *         text:
  *           type: string
  *           description: The content of the comment.
  *           example: "Could be a better station!!!!"
+ *         likes:
+ *           type: number
+ *           description: The number of likes the comment has received.
+ *           example: 10
+ *         dislikes:
+ *           type: number
+ *           description: The number of dislikes the comment has received.
+ *           example: 2
+ *         likedUsers:
+ *           type: array
+ *           items:
+ *             type: string
+ *           description: List of user IDs who liked the comment.
+ *           example: ["60d0fe4f5311236168a109ca", "60d0fe4f5311236168a109cb"]
+ *         dislikedUsers:
+ *           type: array
+ *           items:
+ *             type: string
+ *           description: List of user IDs who disliked the comment.
+ *           example: ["60d0fe4f5311236168a109cc"]
+ *         Rating:
+ *           type: number
+ *           description: The rating of the comment.
+ *           example: 4
+ *         Date:
+ *           type: string
+ *           format: date-time
+ *           description: The date when the comment was created.
+ *           example: "2025-03-05T12:00:00Z"
+*/
 
 
 
 
 
+
+/**
+ * @swagger
  * /addComments/addComment/{chargerId}:
  *   post:
  *     summary: Add a comment to a specific charging station
@@ -55,7 +91,24 @@ const router = Router();
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Comment'
+ *             type: object
+ *             required:
+ *               - chargerId
+ *               - userId
+ *               - text
+ *             properties:
+ *               chargerId:
+ *                 type: string
+ *                 description: The ID of the charging station.
+ *                 example: ""
+ *               userId:
+ *                 type: string
+ *                 description: The ID of the user who made the comment.
+ *                 example: ""
+ *               text:
+ *                 type: string
+ *                 description: The content of the comment.
+ *                 example: "Could be a better station!!!!"
  *     responses:
  *       201:
  *         description: Comment added successfully to the charging station.
@@ -64,19 +117,22 @@ const router = Router();
  *             schema:
  *               type: object
  *               properties:
- *                 message:
+ *                 userId:
  *                   type: string
- *                   example: "Comment added successfully"
- *                 chargingStation:
- *                   type: object
- *                   properties:
- *                     _id:
- *                       type: string
- *                       example: "67861a6f42063748092fa966"
- *                     comments:
- *                       type: array
- *                       items:
- *                         $ref: '#/components/schemas/Comment'
+ *                   example: "60d0fe4f5311236168a109ca"
+ *                 text:
+ *                   type: string
+ *                   example: "Could be a better station!!!!"
+ *                 likes:
+ *                   type: number
+ *                   example: 10
+ *                 Rating:
+ *                   type: number
+ *                   example: 4
+ *                 Date:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2025-03-05T12:00:00Z"
  *       400:
  *         description: Invalid input, comment could not be added.
  *         content:
@@ -86,7 +142,7 @@ const router = Router();
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Comment text is required"
+ *                   example: "Missing required fields"
  *       404:
  *         description: Charging station not found.
  *         content:
@@ -96,7 +152,7 @@ const router = Router();
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Charging station not found"
+ *                   example: "Charger not found"
  *       500:
  *         description: Internal server error.
  *         content:
@@ -106,7 +162,7 @@ const router = Router();
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Failed to add comment"
+ *                   example: "Internal server error"
  */
 router.post("/addComment/:chargerId", authMiddleware, (req, res) => {
     add_comments_controller.addComment(req, res); 
@@ -380,10 +436,160 @@ router.delete("/deleteComment/:chargerId/:commentId", authMiddleware, (req, res)
 
 
 
+
+/**
+ * @swagger
+ * /addComments/getCommentsByChargerId/{chargerId}:
+ *   get:
+ *     summary: Retrieve all comments for a specific charging station
+ *     description: Fetches all comments associated with a specific charging station using its ID.
+ *     tags:
+ *       - Charging Stations Comments
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: chargerId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the charging station.
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved the comments.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Comments retrieved successfully"
+ *                 comments:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Comment'
+ *       404:
+ *         description: Charging station not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Charging station not found"
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Failed to retrieve comments"
+ */
 router.get("/getCommentsByChargerId/:chargerId", authMiddleware, (req, res) => {
     add_comments_controller.getCommentsByChargerId(req, res);
 });
 
+
+
+
+
+/**
+ * @swagger
+ * /addComments/toggleLikeDislikeComment:
+ *   post:
+ *     summary: Toggle like or dislike on a comment
+ *     description: Allows a user to like or dislike a comment on a charging station.
+ *     tags:
+ *       - Charging Stations Comments
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - chargerId
+ *               - commentId
+ *               - userId
+ *             properties:
+ *               chargerId:
+ *                 type: string
+ *                 description: The ID of the charging station.
+ *                 example: ""
+ *               commentId:
+ *                 type: string
+ *                 description: The ID of the comment.
+ *                 example: ""
+ *               userId:
+ *                 type: string
+ *                 description: The ID of the user who is liking or disliking the comment.
+ *                 example: ""
+ *               like:
+ *                 type: boolean
+ *                 description: Whether the user likes the comment.
+ *                 example: true
+ *               dislike:
+ *                 type: boolean
+ *                 description: Whether the user dislikes the comment.
+ *                 example: false
+ *     responses:
+ *       200:
+ *         description: Successfully toggled like or dislike on the comment.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 userId:
+ *                   type: string
+ *                   example: "60d0fe4f5311236168a109ca"
+ *                 text:
+ *                   type: string
+ *                   example: "Could be a better station!!!!"
+ *                 likes:
+ *                   type: number
+ *                   example: 10
+ *                 dislikes:
+ *                   type: number
+ *                   example: 2
+ *                 likedUsers:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["60d0fe4f5311236168a109ca", "60d0fe4f5311236168a109cb"]
+ *                 dislikedUsers:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["60d0fe4f5311236168a109cc"]
+ *       404:
+ *         description: Comment not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Comment not found"
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Server error"
+ */
 router.post("/toggleLikeDislikeComment/", authMiddleware, (req, res) => {
     add_comments_controller.toggleLikeDislikeComment(req, res);
 });

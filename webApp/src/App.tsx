@@ -17,7 +17,7 @@ const App = () => {
   const hideNavbarRoutes = ["/", "/signup"];
 
   return (
-    <GoogleOAuthProvider clientId="88545962635-uj9vqmfnvkh5fbbd14geirpgvmofd6ah.apps.googleusercontent.com">
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
      <AuthProvider> 
         <>
           {!hideNavbarRoutes.includes(location.pathname) && <Navbar />}

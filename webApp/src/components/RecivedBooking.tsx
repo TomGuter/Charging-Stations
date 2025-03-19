@@ -12,13 +12,14 @@ const ReceivedBooking: React.FC<ReceivedBookingProps> = ({ chargers }) => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [selectedCharger, setSelectedCharger] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const handleStatusChange = async (id: string, newStatus: string) => {
     setLoading(true);
 
     try {
       const response = await fetch(
-        `http://localhost:3000/bookings/updateBooking/${id}`,
+        `${import.meta.env.VITE_BACKEND_URL}/bookings/updateBooking/${id}`,
         {
           method: "PUT",
           headers: {
@@ -58,7 +59,7 @@ const ReceivedBooking: React.FC<ReceivedBookingProps> = ({ chargers }) => {
     setLoading(true);
     try {
       const bookingsResponse = await fetch(
-        `http://localhost:3000/bookings/getBookingByChargerId/${chargerId}`,
+        `${import.meta.env.VITE_BACKEND_URL}/bookings/getBookingByChargerId/${chargerId}`,
         {
           method: "GET",
           headers: {
@@ -96,21 +97,59 @@ const ReceivedBooking: React.FC<ReceivedBookingProps> = ({ chargers }) => {
     <div className="received-booking-container">
       <h3>Received Bookings</h3>
 
-      {/* Charger selection dropdown */}
       <div className="charger-selection">
         <label htmlFor="charger-select">Select Charger:</label>
-        <select
-          id="charger-select"
-          value={selectedCharger}
-          onChange={handleChargerChange}
-        >
-          <option value="">--Select a charger--</option>
-          {chargers.map((charger) => (
-            <option key={charger._id} value={charger.chargerId}>
-              {charger.chargerId } { charger.location }
-            </option>
-          ))}
-        </select>
+        <div className="custom-select">
+          <div
+            className="select-selected"
+            onClick={() => setIsOpen(!isOpen)}
+            aria-expanded={isOpen}
+          >
+            {selectedCharger ? (
+              <>
+                <span className="charger-id">
+                  {
+                    chargers.find((c) => c.chargerId === selectedCharger)
+                      ?.chargerId
+                  }
+                </span>
+                <span className="charger-location">
+                  {
+                    chargers.find((c) => c.chargerId === selectedCharger)
+                      ?.location
+                  }
+                </span>
+              </>
+            ) : (
+              "--Select a charger--"
+            )}
+          </div>
+          {isOpen && (
+            <div className="select-items">
+              {chargers.map((charger) => (
+                <div
+                  key={charger._id}
+                  className={`select-item ${
+                    selectedCharger === charger.chargerId ? "selected" : ""
+                  }`}
+                  onClick={() => {
+                    handleChargerChange({
+                      target: {
+                        value: charger.chargerId,
+                        id: "charger-select",
+                        name: "charger-select",
+                      } as HTMLSelectElement,
+                    } as React.ChangeEvent<HTMLSelectElement>);
+                    setIsOpen(false);
+                  }}
+                >
+                  <span className="charger-id">{charger.chargerId}</span>
+                  <span className="charger-location">{charger.location}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* If no charger selected, show a message */}

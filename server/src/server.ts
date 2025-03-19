@@ -65,7 +65,7 @@ const moduleApp = async (): Promise<Express> => {
 
   try {
     await mongoose.connect(process.env.DB_CONNECT);
-    console.log("Connected to MongoDB!");
+    console.log("Connected to MongoDB");
   } catch (error) {
     console.error("Failed to connect to MongoDB", error);
     throw error;

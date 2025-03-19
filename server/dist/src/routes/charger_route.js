@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const charger_controller_1 = __importDefault(require("../controllers/charger_controller"));
 const user_controller_auth_1 = require("../controllers/user_controller_auth");
+const uploads_1 = __importDefault(require("../uploads"));
 const router = (0, express_1.Router)();
 /**
  * @swagger
@@ -30,8 +31,12 @@ const router = (0, express_1.Router)();
  *     ChargingStation:
  *       type: object
  *       required:
+ *         - userId
+ *         - location
+ *         - chargingRate
  *         - price
- *         - rating
+ *         - description
+ *         - imageFile
  *       properties:
  *         _id:
  *           type: string
@@ -63,17 +68,10 @@ const router = (0, express_1.Router)();
  *           type: string
  *           description: The ID of the user who added the charging station
  *       example:
- *         _id: 67861a6f42063748092fa966
- *         latitude: 41.1234
- *         longitude: -75.1234
- *         price: 15
- *         rating: 4.8
- *         picture: http://example.com/newpicture.jpg
- *         description: Updated charging station description
- *         comments:
- *           - text: Great location and service
- *           - text: Clean and well-maintained
- *         userId: 67861a6f42063748092fa962
+ *         Location:
+ *         Price:
+ *         rating:
+ *         Description:
  */
 /**
  * @swagger
@@ -88,47 +86,36 @@ const router = (0, express_1.Router)();
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
- *               latitude:
- *                 type: number
- *                 description: The latitude of the charging station
- *               longitude:
- *                 type: number
- *                 description: The longitude of the charging station
- *               price:
- *                 type: number
- *                 description: Price for using the charging station
- *               rating:
- *                 type: number
- *                 description: Rating of the charging station
- *               picture:
- *                 type: string
- *                 description: Picture URL of the charging station
- *               description:
- *                 type: string
- *                 description: Description of the charging station
- *               comments:
- *                 type: array
- *                 description: List of comments to add with the charging station
- *                 items:
- *                   $ref: '#/components/schemas/Comment'
  *               userId:
  *                 type: string
  *                 description: The ID of the user adding the charging station
+ *               location:
+ *                 type: string
+ *                 description: The location of the charging station
+ *               chargingRate:
+ *                 type: number
+ *                 description: Charging rate of the charging station
+ *               price:
+ *                 type: number
+ *                 description: Price for using the charging station
+ *               description:
+ *                 type: string
+ *                 description: Description of the charging station
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *                 description: Image file of the charging station
  *             example:
- *               latitude: 41.1234
- *               longitude: -75.1234
- *               price: 15
- *               rating: 4.8
- *               picture: http://example.com/newpicture.jpg
- *               description: Updated charging station description
- *               comments:
- *                 - text: Great location and service
- *                 - text: Clean and well-maintained
  *               userId: 67861a6f42063748092fa962
+ *               location: "123 Main St, Anytown, USA"
+ *               chargingRate: 5
+ *               price: 10
+ *               description: "A new charging station"
+ *               image: "image.jpg"
  *     responses:
  *       201:
  *         description: Charging station created successfully
@@ -147,7 +134,7 @@ const router = (0, express_1.Router)();
  *       500:
  *         description: Server error
  */
-router.post("/addCharger", user_controller_auth_1.authMiddleware, (req, res) => {
+router.post("/addCharger", user_controller_auth_1.authMiddleware, uploads_1.default.single("image"), (req, res) => {
     charger_controller_1.default.addChargingStation(req, res);
 });
 /**
@@ -277,8 +264,11 @@ router.get("/getChargersByUserId/chargers/:userId", user_controller_auth_1.authM
  *       500:
  *         description: Server error
  */
-router.put("/updateCharger/:chargerId", user_controller_auth_1.authMiddleware, (req, res) => {
+router.put("/updateCharger/:chargerId", uploads_1.default.single("image"), user_controller_auth_1.authMiddleware, (req, res) => {
     charger_controller_1.default.updateCharger(req, res);
+});
+router.put("/toggleLikeDislikeCharger/", user_controller_auth_1.authMiddleware, (req, res) => {
+    charger_controller_1.default.toggleLikeDislikeCharger(req, res);
 });
 /**
  * @swagger
@@ -310,30 +300,23 @@ router.delete("/deleteChargerById/:chargerId/", user_controller_auth_1.authMiddl
 });
 /**
  * @swagger
- * /addChargingStation/addSelectedChargingStation/{userId}/{chargerId}:
- *   post:
- *     summary: Add a selected charging station to user's list
- *     description: Adds a charging station to a user's selected charging stations list based on the user ID and charger ID.
+ * /addChargingStation/getAllChargers:
+ *   get:
+ *     summary: Get all charging stations
+ *     description: Retrieve a list of all charging stations.
  *     tags:
  *       - Charging Stations
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: string
- *         description: The unique ID of the user to which the charging station will be added
- *       - in: path
- *         name: chargerId
- *         required: true
- *         schema:
- *           type: string
- *         description: The unique ID of the charging station to add
  *     responses:
  *       200:
- *         description: Charging station added to the user's list successfully
+ *         description: List of charging stations retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/ChargingStation'
+ *       500:
+ *         description: Server error
  *         content:
  *           application/json:
  *             schema:
@@ -341,19 +324,77 @@ router.delete("/deleteChargerById/:chargerId/", user_controller_auth_1.authMiddl
  *               properties:
  *                 message:
  *                   type: string
- *                   example: Charging station added to user's list successfully
- *                 user:
- *                   $ref: '#/components/schemas/User'
- *       404:
- *         description: User or charging station not found
- *       500:
- *         description: Server error
+ *                   example: "Failed to retrieve charging stations"
  */
-router.post("/addSelectedChargingStation/:userId/:chargerId", user_controller_auth_1.authMiddleware, (req, res) => {
-    charger_controller_1.default.addSelectedChargingStation(req, res);
-});
 router.get("/getAllChargers", (req, res) => {
     charger_controller_1.default.getAllChargers(req, res);
+});
+/**
+ * @swagger
+ * /addChargingStation/getUserByChargerId/{chargerId}:
+ *   get:
+ *     summary: Get user by charger ID
+ *     description: Retrieve the user who added a specific charging station using its ID.
+ *     tags:
+ *       - Charging Stations
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: chargerId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the charging station
+ *     responses:
+ *       200:
+ *         description: User retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                       example: "60d0fe4f5311236168a109ca"
+ *                     firstName:
+ *                       type: string
+ *                       example: "Tom"
+ *                     lastName:
+ *                       type: string
+ *                       example: "Guter"
+ *                     email:
+ *                       type: string
+ *                       example: "test@gmail.com"
+ *                     phoneNumber:
+ *                       type: string
+ *                       example: "0541234567"
+ *       404:
+ *         description: Charging station not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Charging station not found"
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Server error"
+ */
+router.get("/getUserByChargerId/:chargerId", user_controller_auth_1.authMiddleware, (req, res) => {
+    charger_controller_1.default.getUserByChargerId(req, res);
 });
 exports.default = router;
 //# sourceMappingURL=charger_route.js.map

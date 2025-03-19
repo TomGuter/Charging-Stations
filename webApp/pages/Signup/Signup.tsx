@@ -37,7 +37,7 @@ export default function Signup() {
     };
 
     try {
-      const signupResponse = await fetch("http://localhost:3000/auth/signUp", {
+      const signupResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/signUp`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -50,7 +50,7 @@ export default function Signup() {
       }
 
       const loginData = { email, password };
-      const loginResponse = await fetch("http://localhost:3000/auth/login", {
+      const loginResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

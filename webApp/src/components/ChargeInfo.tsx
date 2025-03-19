@@ -65,7 +65,7 @@ export default function ChargeInfo({ rows }: ChargeInfoProps) {
 
     try {
       const response = await fetch(
-        `http://localhost:3000/addChargingStation/updateCharger/${editData.chargerId}`,
+        `${import.meta.env.VITE_BACKEND_URL}/addChargingStation/updateCharger/${editData.chargerId}`,
         {
           method: "PUT",
           headers: {
@@ -97,11 +97,13 @@ export default function ChargeInfo({ rows }: ChargeInfoProps) {
   const handleDeleteClick = async (id: number) => {
     const charger = rows.find((row) => row.id === id);
     if (charger) {
-      const confirmed = window.confirm(`Are you sure you want to delete charger at ${charger.Location}?`);
+      const confirmed = window.confirm(
+        `Are you sure you want to delete charger at ${charger.Location}?`
+      );
       if (confirmed) {
         try {
           const response = await fetch(
-            `http://localhost:3000/addChargingStation/deleteChargerById/${charger.chargerId}`,
+            `${import.meta.env.VITE_BACKEND_URL}/addChargingStation/deleteChargerById/${charger.chargerId}`,
             {
               method: "DELETE",
               headers: {
@@ -144,147 +146,151 @@ export default function ChargeInfo({ rows }: ChargeInfoProps) {
   };
 
   return (
-    <div className="charge-container">
-      <TableContainer component={Paper} className="table-container">
-        <Typography variant="h5" className="table-title">
-          My Charging Stations
-        </Typography>
-        <Table stickyHeader className="without-title">
-          <TableHead>
-            <TableRow className="table-header-row">
-              <TableCell className="table-header-cell" style={{ color: "black" }}>
-                Location
+    <TableContainer component={Paper} className="table-container">
+      <Typography variant="h5" className="table-title">
+        My Charging Stations
+      </Typography>
+      <Table stickyHeader className="without-title">
+        <TableHead>
+          <TableRow className="table-header-row">
+            <TableCell className="table-header-cell" style={{ color: "black" }}>
+              Location
+            </TableCell>
+            <TableCell className="table-header-cell">Charging Rate</TableCell>
+            <TableCell className="table-header-cell">Description</TableCell>
+            <TableCell className="table-header-cell">Price</TableCell>
+            <TableCell className="table-header-cell">Picture</TableCell>
+            <TableCell className="table-header-cell">Actions</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {rows.map((row) => (
+            <TableRow key={row.id} className="table-row">
+              <TableCell className="table-cell">
+                {editableRow === row.id ? (
+                  <TextField
+                    name="Location"
+                    value={editData?.Location || ""}
+                    onChange={handleChange}
+                    fullWidth
+                  />
+                ) : (
+                  row.Location
+                )}
               </TableCell>
-              <TableCell className="table-header-cell">Charging Rate</TableCell>
-              <TableCell className="table-header-cell">Description</TableCell>
-              <TableCell className="table-header-cell">Price</TableCell>
-              <TableCell className="table-header-cell">Picture</TableCell>
-              <TableCell className="table-header-cell">Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map((row) => (
-              <TableRow key={row.id} className="table-row">
-                <TableCell className="table-cell">
-                  {editableRow === row.id ? (
-                    <TextField
-                      name="Location"
-                      value={editData?.Location || ""}
-                      onChange={handleChange}
+              <TableCell className="table-cell">
+                {editableRow === row.id ? (
+                  <TextField
+                    name="ChargingRate"
+                    value={editData?.ChargingRate || ""}
+                    onChange={handleChange}
+                    fullWidth
+                  />
+                ) : (
+                  row.ChargingRate
+                )}
+              </TableCell>
+              <TableCell className="table-cell">
+                {editableRow === row.id ? (
+                  <TextField
+                    name="Description"
+                    value={editData?.Description || ""}
+                    onChange={handleChange}
+                    fullWidth
+                  />
+                ) : (
+                  row.Description
+                )}
+              </TableCell>
+              <TableCell className="table-cell">
+                {editableRow === row.id ? (
+                  <TextField
+                    name="Price"
+                    type="number"
+                    value={editData?.Price || ""}
+                    onChange={handleChange}
+                    fullWidth
+                  />
+                ) : (
+                  row.Price
+                )}
+              </TableCell>
+              <TableCell className="table-cell">
+                {editableRow === row.id ? (
+                  <Box>
+                    <Input
+                      type="file"
+                      onChange={handleFileChange}
                       fullWidth
+                      className="file-upload-input"
                     />
-                  ) : (
-                    row.Location
-                  )}
-                </TableCell>
-                <TableCell className="table-cell">
-                  {editableRow === row.id ? (
-                    <TextField
-                      name="ChargingRate"
-                      value={editData?.ChargingRate || ""}
-                      onChange={handleChange}
-                      fullWidth
-                    />
-                  ) : (
-                    row.ChargingRate
-                  )}
-                </TableCell>
-                <TableCell className="table-cell">
-                  {editableRow === row.id ? (
-                    <TextField
-                      name="Description"
-                      value={editData?.Description || ""}
-                      onChange={handleChange}
-                      fullWidth
-                    />
-                  ) : (
-                    row.Description
-                  )}
-                </TableCell>
-                <TableCell className="table-cell">
-                  {editableRow === row.id ? (
-                    <TextField
-                      name="Price"
-                      type="number"
-                      value={editData?.Price || ""}
-                      onChange={handleChange}
-                      fullWidth
-                    />
-                  ) : (
-                    row.Price
-                  )}
-                </TableCell>
-                <TableCell className="table-cell">
-                  {editableRow === row.id ? (
-                    <Box>
-                      <Input
-                        type="file"
-                        onChange={handleFileChange}
-                        fullWidth
-                        className="file-upload-input"
+                    {editData?.picture && (
+                      <img
+                        src={editData.picture}
+                        alt="Preview"
+                        style={{
+                          width: "50px",
+                          height: "50px",
+                          objectFit: "cover",
+                          borderRadius: "4px",
+                        }}
                       />
-                      {editData?.picture && (
-                        <img
-                          src={editData.picture}
-                          alt="Preview"
-                          style={{
-                            width: "50px",
-                            height: "50px",
-                            objectFit: "cover",
-                            borderRadius: "4px",
-                          }}
-                        />
-                      )}
-                    </Box>
-                  ) : row.picture ? (
-                    <img
-                      src={`http://localhost:3000${row.picture}`}
-                      alt="Charging Station"
-                      style={{
-                        width: "50px",
-                        height: "50px",
-                        objectFit: "cover",
-                        borderRadius: "4px",
-                      }}
-                    />
-                  ) : (
-                    <Typography variant="body2" color="textSecondary">
-                      No Image
-                    </Typography>
-                  )}
-                </TableCell>
-                <TableCell className="table-cell">
-                  {editableRow === row.id ? (
-                    <Box display="flex" gap="16px" justifyContent="center">
-                      <button onClick={handleSaveClick} className="schedule-btn save-btn">
-                        Save
-                      </button>
-                      <button onClick={handleCancelClick} className="schedule-btn cancel-btn">
-                        Cancel
-                      </button>
-                    </Box>
-                  ) : (
-                    <Box display="flex" gap="16px" justifyContent="center">
-                      <button
-                        onClick={() => handleEditClick(row.id)}
-                        className="schedule-btn edit-btn"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDeleteClick(row.id)}
-                        className="schedule-btn delete-btn"
-                      >
-                        Delete
-                      </button>
-                    </Box>
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </div>
+                    )}
+                  </Box>
+                ) : row.picture ? (
+                  <img
+                    src={`${import.meta.env.VITE_BACKEND_URL}${row.picture}`}
+                    alt="Charging Station"
+                    style={{
+                      width: "50px",
+                      height: "50px",
+                      objectFit: "cover",
+                      borderRadius: "4px",
+                    }}
+                  />
+                ) : (
+                  <Typography variant="body2" color="textSecondary">
+                    No Image
+                  </Typography>
+                )}
+              </TableCell>
+              <TableCell className="table-cell">
+                {editableRow === row.id ? (
+                  <Box display="flex" gap="16px" justifyContent="center">
+                    <button
+                      onClick={handleSaveClick}
+                      className="schedule-btn save-btn"
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={handleCancelClick}
+                      className="schedule-btn cancel-btn"
+                    >
+                      Cancel
+                    </button>
+                  </Box>
+                ) : (
+                  <Box display="flex" gap="16px" justifyContent="center">
+                    <button
+                      onClick={() => handleEditClick(row.id)}
+                      className="schedule-btn edit-btn"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDeleteClick(row.id)}
+                      className="schedule-btn delete-btn"
+                    >
+                      Delete
+                    </button>
+                  </Box>
+                )}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 }

@@ -27,7 +27,8 @@ const userSchema = new mongoose_1.default.Schema({
     },
     picture: {
         type: String,
-        required: false
+        required: false,
+        default: null,
     },
     selectedChargingStations: {
         type: [mongoose_1.default.Schema.Types.ObjectId],

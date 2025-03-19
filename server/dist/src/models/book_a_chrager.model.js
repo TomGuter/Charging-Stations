@@ -22,6 +22,18 @@ const BookCharger = new mongoose_1.default.Schema({
         type: Date,
         required: true,
     },
+    contactNumber: {
+        type: String,
+        required: true,
+    },
+    Message: {
+        type: String,
+        required: true,
+    },
+    Status: {
+        type: String,
+        default: "Pending",
+    },
     userId: {
         type: mongoose_1.default.Schema.Types.ObjectId,
         ref: "Users",

@@ -4,7 +4,7 @@
   left: 50%;
   transform: translateX(-50%);
   width: 100%;
-  background: linear-gradient(to right, #6a11cb, #2575fc);
+  background: linear-gradient(to right, black, white);
   padding: 1rem 2rem;
   display: flex;
   justify-content: center;
@@ -29,7 +29,7 @@
   top: 100%;
   right: 0;
   width: 100%;
-  background: linear-gradient(to right, #6a11cb, #2575fc);
+  /* background: linear-gradient(to right, #022215, #072b14); */
   padding: 1rem 0;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
   z-index: 999;
@@ -84,6 +84,7 @@
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease;
+  white-space: nowrap;
 }
 
 .hamburger {

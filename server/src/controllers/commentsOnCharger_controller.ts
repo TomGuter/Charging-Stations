@@ -1,10 +1,8 @@
 import { Request, Response } from "express";
 import ChargingModel from "../models/add_charging_model";
 import chargingModel from "../models/add_charging_model";
-import mongoose from "mongoose";
 
 const addComment = async (req: Request, res: Response) => {
-    console.log("addComment");
     const { chargerId, userId, text, likes = 0, rating = 0 } = req.body;
 
   if (!chargerId || !userId || !text) {

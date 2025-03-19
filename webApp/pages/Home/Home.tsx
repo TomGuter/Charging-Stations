@@ -23,9 +23,17 @@ interface ChargingStation {
   userId: string;
 }
 
+function MapUpdater({ coordinates }: { coordinates: { lat: number; lng: number } | null }) {
+  const map = useMap();
 
+  useEffect(() => {
+    if (coordinates) {
+      map.flyTo([coordinates.lat, coordinates.lng], 14); 
+    }
+  }, [coordinates, map]);
 
-
+  return null; 
+}
 
 function ReturnToLocationButton({
   userLocation,
@@ -49,8 +57,9 @@ function ReturnToLocationButton({
         width: "250px",
         position: "absolute",
         right: 0,
+        bottom: 0,
         zIndex: 1000,
-        backgroundColor: "#066C91",
+        backgroundColor: "red",
         color: "#fff",
         border: "none",
         borderRadius: "8px",
@@ -79,7 +88,6 @@ function calculateChargingTime(
 }
 
 export default function Home() {
-  
   const navigate = useNavigate();
   const location = useLocation();
   const message = location.state?.message;
@@ -145,7 +153,7 @@ export default function Home() {
     const fetchChargingStations = async () => {
       try {
         const response = await fetch(
-          "http://localhost:3000/addChargingStation/getAllChargers"
+          `${import.meta.env.VITE_BACKEND_URL}/addChargingStation/getAllChargers`
         );
         const data = await response.json();
         if (data.chargers) {
@@ -167,7 +175,7 @@ export default function Home() {
         }
 
         const response = await fetch(
-          "http://localhost:3000/carData/get-car-data",
+          `${import.meta.env.VITE_BACKEND_URL}/carData/get-car-data`,
           {
             method: "POST",
             headers: {
@@ -273,7 +281,7 @@ export default function Home() {
               <Popup>
                 {charger.picture ? (
                   <img
-                    src={`http://localhost:3000${charger.picture}`}
+                    src={`${import.meta.env.VITE_BACKEND_URL}${charger.picture}`}
                     alt="Charging Station"
                     style={{
                       width: "100%",
@@ -285,17 +293,17 @@ export default function Home() {
                   />
                 ) : (
                   <p style={{ fontStyle: "italic", color: "gray" }}>
-                  <img
-                    src={`https://www.revixpert.ch/app/uploads/portrait-placeholder.jpg`}
-                    alt="Charging Station"
-                    style={{
-                      width: "100%",
-                      height: "150px",
-                      objectFit: "cover",
-                      borderRadius: "8px",
-                      marginBottom: "10px",
-                    }}
-                  />
+                    <img
+                      src={`https://www.revixpert.ch/app/uploads/portrait-placeholder.jpg`}
+                      alt="Charging Station"
+                      style={{
+                        width: "100%",
+                        height: "150px",
+                        objectFit: "cover",
+                        borderRadius: "8px",
+                        marginBottom: "10px",
+                      }}
+                    />
                     No image available
                   </p>
                 )}
@@ -347,6 +355,8 @@ export default function Home() {
           ))}
 
           <ReturnToLocationButton userLocation={userLocation} />
+          <MapUpdater coordinates={coordinates} />
+
         </MapContainer>
       )}
     </div>

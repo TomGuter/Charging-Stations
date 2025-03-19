@@ -1,23 +1,22 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "main": "app.js",
+  "main": "app.ts",
   "scripts": {
-    "dev": "nodemon ./src/app.ts",
-    "start": "tsc && node ./dist/app.js",
-    "test": "tsc && jest --detectOpenHandles --forceExit --runInBand",
-    "testAuth": "tsc && jest --detectOpenHandles --forceExit user_auth.test.ts",
-    "chargingStation": "tsc && jest --detectOpenHandles --forceExit add_charger.test.ts",
-    "commentsOnCharger": "tsc && jest --detectOpenHandles --forceExit add_comments.test.ts",
-    "geminiTest": "tsc && jest --detectOpenHandles --forceExit gemini.test.ts",
-    "bookCharger": "tsc && jest --detectOpenHandles --forceExit book_a_charger.test.ts",
+   "dev": "copy .\\.env_dev .env && nodemon ./src/app.ts",
+    "start": "copy .\\.env_dev .env && tsc && node ./dist/app.ts",
+    "test": "copy .\\.env_test .env && tsc && jest --detectOpenHandles --forceExit --runInBand --coverage",
+    "testAuth": "copy .\\.env_test .env && tsc && jest --detectOpenHandles --forceExit user_auth.test.ts --runInBand --coverage",
+    "chargingStation": "copy .\\.env_test .env && tsc && jest --detectOpenHandles --forceExit add_charger.test.ts --runInBand --coverage",
+    "commentsOnCharger": "copy .\\.env_test .env && tsc && jest --detectOpenHandles --forceExit add_comments.test.ts --runInBand --coverage",
+    "bookCharger": "copy .\\.env_test .env && tsc && jest --detectOpenHandles --forceExit book_a_charger.test.ts --runInBand --coverage",
+    "carDataTest": "copy .\\.env_test .env && tsc && jest --detectOpenHandles --forceExit car_data.test.ts --runInBand --coverage",
     "lint": "eslint . --ext .ts"
   },
   "author": "Tom and Hodaya",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@types/react-router-dom": "^5.3.3",
     "axios": "^1.7.9",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
@@ -30,9 +29,7 @@
     "multer": "^1.4.5-lts.1",
     "nodemon": "^3.1.7",
     "punycode": "^2.3.1",
-    "react": "^19.0.0",
-    "react-router": "^7.1.2",
-    "react-router-dom": "^5.3.4"
+    "react": "^19.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
@@ -44,8 +41,6 @@
     "@types/jest": "^29.5.14",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/multer": "^1.4.12",
-    "@types/react": "^19.0.7",
-    "@types/react-router": "^5.1.20",
     "@types/supertest": "^6.0.2",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.7",

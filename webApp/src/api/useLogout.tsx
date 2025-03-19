@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 
-const BASE_URL = "http://localhost:3000"; // Adjust to your API base URL
 
 export const useLogout = () => {
   const navigate = useNavigate();
@@ -13,7 +12,7 @@ export const useLogout = () => {
     }
 
     try {
-      const response = await fetch(`${BASE_URL}/auth/logout`, {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/logout`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -31,7 +30,7 @@ export const useLogout = () => {
       localStorage.clear();
 
       console.log("Logout successful");
-      navigate("/", { replace: true }); 
+      navigate("/", { replace: true });
       return { message: "Logout successful" };
     } catch (error) {
       console.error("Error during logout:", error);
@@ -40,6 +39,9 @@ export const useLogout = () => {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
       localStorage.clear();
+      navigate("/", { replace: true });
+
+      ////add also if cancel refresh token so i can press logout and it will be logged out
 
       if (error instanceof Error) {
         return { error: error.message || "Logout failed" };

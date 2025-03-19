@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import "./Booking.css";
 import ReviewCard from "../../src/components/ReviewCard/ReviewCard";
 
-
 interface ChargerOwner {
   _id: string;
   firstName: string;
@@ -44,7 +43,7 @@ export default function Booking() {
         try {
           const accessToken = localStorage.getItem("accessToken");
           const response = await fetch(
-            `http://localhost:3000/addChargingStation/getUserByChargerId/${charger._id}`,
+            `${import.meta.env.VITE_BACKEND_URL}/addChargingStation/getUserByChargerId/${charger._id}`,
             {
               method: "GET",
               headers: {
@@ -100,7 +99,7 @@ export default function Booking() {
     try {
       const accessToken = localStorage.getItem("accessToken");
       const response = await fetch(
-        "http://localhost:3000/bookings/bookCharger",
+        `${import.meta.env.VITE_BACKEND_URL}/bookings/bookCharger`,
         {
           method: "POST",
           headers: {
@@ -137,152 +136,159 @@ export default function Booking() {
   };
 
   return (
-    <div className="booking-page-container">
-      <div className="booking-row">
-        <div className="booking-form-container">
-          <h2 className="booking-form-title">Charging Station Booking</h2>
-          <form className="booking-form" onSubmit={handleSubmit}>
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label" htmlFor="firstName">
-                  First Name
-                </label>
-                <input
-                  type="text"
-                  id="firstName"
-                  name="firstName"
-                  value={formData.firstName}
-                  onChange={handleChange}
-                  required
-                  className="form-input"
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label" htmlFor="lastName">
-                  Last Name
-                </label>
-                <input
-                  type="text"
-                  id="lastName"
-                  name="lastName"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  required
-                  className="form-input"
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label" htmlFor="contactNumber">
-                  Contact Number
-                </label>
-                <input
-                  type="tel"
-                  id="contactNumber"
-                  name="contactNumber"
-                  value={formData.contactNumber}
-                  onChange={handleChange}
-                  required
-                  className="form-input"
-                />
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label className="form-label" htmlFor="message">
-                Message
-              </label>
-              <textarea
-                id="message"
-                name="message"
-                value={formData.message}
-                onChange={handleChange}
-                required
-                className="form-textarea"
-              ></textarea>
-            </div>
-
-            <div className="form-group">
-              <label className="form-label" htmlFor="date">
-                Date
-              </label>
-              <input
-                type="date"
-                id="date"
-                name="date"
-                value={formData.date}
-                onChange={handleChange}
-                required
-                className="form-input"
-              />
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label" htmlFor="startTime">
-                  Start Time
-                </label>
-                <input
-                  type="time"
-                  id="startTime"
-                  name="startTime"
-                  value={formData.startTime}
-                  onChange={handleChange}
-                  required
-                  className="form-input"
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label" htmlFor="endTime">
-                  End Time
-                </label>
-                <input
-                  type="time"
-                  id="endTime"
-                  name="endTime"
-                  value={formData.endTime}
-                  onChange={handleChange}
-                  required
-                  className="form-input"
-                />
-              </div>
-            </div>
-
-            {error && <p className="error">{error}</p>}
-            {successMessage && <p className="success">{successMessage}</p>}
-
-            <button type="submit" className="submit-button">
-              Submit
-            </button>
-          </form>
-        </div>
-
-        <div className="review-container">
-          {charger ? (
-            <ReviewCard
-              userName={
-                chargerOwner && chargerOwner.firstName && chargerOwner.lastName
-                  ? `${chargerOwner.firstName} ${chargerOwner.lastName}`
-                  : "Unknown Owner"
-              }
-              location={charger.location || "Unknown Location"}
-              rating={charger.rating || 0}
-              picture={
-                charger.picture
-                  ? `http://localhost:3000${charger.picture}`
-                  : "https://www.revixpert.ch/app/uploads/portrait-placeholder.jpg"
-              }
-              
-              charger={charger}
+    <div className="booking-row">
+      <h2
+        className="booking-form-title"
+        style={{
+          fontSize: "40px",
+          fontWeight: "bold",
+          textAlign: "center",
+          color: "black",
+          WebkitBackgroundClip: "text",
+        }}
+      >
+        Charging Station <br />
+        Booking
+      </h2>
+      <form className="booking-form" onSubmit={handleSubmit}>
+        <div className="form-row">
+          <div className="form-group">
+            <label className="form-label" htmlFor="firstName">
+              First Name
+            </label>
+            <input
+              type="text"
+              id="firstName"
+              name="firstName"
+              value={formData.firstName}
+              onChange={handleChange}
+              required
+              className="form-input"
             />
-          ) : (
-            <p>Loading charger details...</p>
-          )}
+          </div>
+
+          <div className="form-group">
+            <label className="form-label" htmlFor="lastName">
+              Last Name
+            </label>
+            <input
+              type="text"
+              id="lastName"
+              name="lastName"
+              value={formData.lastName}
+              onChange={handleChange}
+              required
+              className="form-input"
+            />
+          </div>
         </div>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label className="form-label" htmlFor="contactNumber">
+              Contact Number
+            </label>
+            <input
+              type="tel"
+              id="contactNumber"
+              name="contactNumber"
+              value={formData.contactNumber}
+              onChange={handleChange}
+              required
+              className="form-input"
+            />
+          </div>
+        </div>
+
+        <div className="form-group">
+          <label className="form-label" htmlFor="message">
+            Message
+          </label>
+          <textarea
+            id="message"
+            name="message"
+            value={formData.message}
+            onChange={handleChange}
+            required
+            className="form-textarea"
+          ></textarea>
+        </div>
+
+        <div className="form-group">
+          <label className="form-label" htmlFor="date">
+            Date
+          </label>
+          <input
+            type="date"
+            id="date"
+            name="date"
+            value={formData.date}
+            onChange={handleChange}
+            required
+            className="form-input"
+          />
+        </div>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label className="form-label" htmlFor="startTime">
+              Start Time
+            </label>
+            <input
+              type="time"
+              id="startTime"
+              name="startTime"
+              value={formData.startTime}
+              onChange={handleChange}
+              required
+              className="form-input"
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label" htmlFor="endTime">
+              End Time
+            </label>
+            <input
+              type="time"
+              id="endTime"
+              name="endTime"
+              value={formData.endTime}
+              onChange={handleChange}
+              required
+              className="form-input"
+            />
+          </div>
+        </div>
+
+        {error && <p className="error">{error}</p>}
+        {successMessage && <p className="success">{successMessage}</p>}
+
+        <button type="submit" className="submit-button">
+          Submit
+        </button>
+      </form>
+
+      <div className="review-container">
+        {charger ? (
+          <ReviewCard
+            userName={
+              chargerOwner && chargerOwner.firstName && chargerOwner.lastName
+                ? `${chargerOwner.firstName} ${chargerOwner.lastName}`
+                : "Unknown Owner"
+            }
+            location={charger.location || "Unknown Location"}
+            rating={charger.rating || 0}
+            picture={
+              charger.picture
+                ? `${import.meta.env.VITE_BACKEND_URL}${charger.picture}`
+                : "https://www.revixpert.ch/app/uploads/portrait-placeholder.jpg"
+            }
+            charger={charger}
+          />
+        ) : (
+          <p>Loading charger details...</p>
+        )}
       </div>
     </div>
   );

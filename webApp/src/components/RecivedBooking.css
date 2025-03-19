@@ -1,86 +1,314 @@
 .received-booking-container {
-  padding: 20px;
+  padding: 1rem 2rem;
   background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  font-family: "Arial", sans-serif;
-  max-width: 1200px;
-  margin: 40px auto;
+  display: flex;
+  flex-direction: column;
 }
 
 h3 {
-  margin-bottom: 20px;
-  font-size: 1.8rem;
-  color: #1976d2;
+  margin-bottom: 2rem;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #000000;
   text-align: center;
+  position: relative;
+}
+
+.charger-selection {
+  margin: 2rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  position: relative;
+}
+
+.charger-selection label {
+  font-weight: 600;
+  color: #000000;
+  font-size: 1.1rem;
+}
+
+.custom-select {
+  position: relative;
+  min-width: 300px;
+}
+
+.select-selected {
+  padding: 1rem 1.5rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #000000;
+  background-color: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.select-selected::after {
+  content: "";
+  position: absolute;
+  right: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid #000;
+  transition: transform 0.2s ease;
+}
+
+.select-selected:hover {
+  border-color: #000000;
+  background-color: #f8f8f8;
+}
+
+.select-selected .charger-id {
+  color: #666666;
+  font-size: 0.9rem;
+  padding-right: 1rem;
+  white-space: nowrap;
+}
+
+.select-selected .charger-location {
+  font-weight: 500;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.select-items {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  right: 0;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  max-height: 100px;
+  overflow-y: auto;
+  z-index: 100;
+  animation: dropdownFade 0.2s ease;
+  padding: 8px 0;
+}
+
+@keyframes dropdownFade {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.select-items .select-item {
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.select-items .select-item:last-child {
+  border-bottom: none;
+}
+
+.select-items .select-item:hover {
+  background-color: #f0f0f0;
+}
+
+.select-items .select-item.selected {
+  background-color: #f5f5f5;
+  font-weight: 600;
+}
+
+.select-items .charger-id {
+  color: #666666;
+  font-size: 0.9rem;
+  padding-right: 1rem;
+  white-space: nowrap;
+}
+
+.select-items .charger-location {
+  font-weight: 500;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Scrollbar styling */
+.select-items::-webkit-scrollbar {
+  width: 6px;
+}
+
+.select-items::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+  margin: 4px;
+}
+
+.select-items::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
+}
+
+.select-items::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Rotate arrow when dropdown is open */
+.select-selected[aria-expanded="true"]::after {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.booking-details {
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+  position: relative;
 }
 
 .booking-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 20px;
+  background-color: #ffffff;
+}
+
+.booking-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: #ffffff;
+}
+
+.booking-table tbody {
+  display: block;
+  overflow-y: auto;
+  height: calc(100vh - 250px);
+}
+
+.booking-table thead tr,
+.booking-table tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
 }
 
 .booking-table th,
 .booking-table td {
   text-align: left;
-  padding: 12px;
-  border-bottom: 1px solid #ddd;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e0e0e0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .booking-table th {
-  background-color: #f4f6f8;
-  color: #333;
-  font-weight: bold;
+  background-color: #f5f5f5;
+  color: #000000;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+}
+
+.booking-table tr:hover {
+  background-color: #f9f9f9;
 }
 
 .status {
-  font-weight: bold;
+  font-weight: 600;
   text-transform: capitalize;
-  gap: 8px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  width: fit-content;
 }
 
 .status-icon {
-  font-size: 1.2rem;
+  font-size: 1.25rem;
 }
 
 .status-confirmed {
-  color: #4caf50;
+  color: #000000;
+  background-color: #f0f0f0;
 }
 
 .status-rejected {
-  color: #f44336;
+  color: #000000;
+  background-color: #e0e0e0;
 }
 
 .status-pending {
-  color: #ffa726;
+  color: #000000;
+  background-color: #f5f5f5;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.75rem;
 }
 
 .action-buttons button {
-  margin-right: 10px;
-  padding: 8px 16px;
-  font-size: 14px;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  transition: transform 0.2s ease, background-color 0.3s ease;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.action-buttons button:first-child {
+  background-color: #000000;
+  color: white;
+}
+
+.action-buttons button:last-child {
+  background-color: #333333;
+  color: white;
 }
 
 .action-buttons button:hover {
-  transform: scale(1.05);
+  transform: translateY(-1px);
+  opacity: 0.9;
 }
 
-.action-buttons button:nth-child(1) {
-  background-color: #4caf50;
-  color: white;
-}
-
-.action-buttons button:nth-child(2) {
-  background-color: #f44336;
-  color: white;
+.action-buttons button:active {
+  transform: translateY(0);
 }
 
 .action-buttons button:disabled {
-  background-color: #ccc;
+  background-color: #e0e0e0;
+  color: #666666;
   cursor: not-allowed;
+  transform: none;
+}
+
+/* Loading and empty states */
+.booking-details p {
+  text-align: center;
+  padding: 2rem;
+  color: #666666;
+  font-size: 1.1rem;
+  background-color: #f9f9f9;
+  margin: 1rem 0;
 }

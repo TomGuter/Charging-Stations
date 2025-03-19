@@ -22,8 +22,8 @@ export default function GeneralInfoHeader({
   });
   const [loading, setLoading] = useState(false);
   const [picture, setPicture] = useState(
-    picturePath ? `http://localhost:3000${picturePath}` : ""
-  ); 
+    picturePath ? `${import.meta.env.VITE_BACKEND_URL}${picturePath}` : ""
+  );
 
   const toggleEditMode = () => {
     setIsEditing(!isEditing);
@@ -42,39 +42,38 @@ export default function GeneralInfoHeader({
   const updateUser = async () => {
     const userId = localStorage.getItem("userId");
     const accessToken = localStorage.getItem("accessToken");
-  
+
     if (!userId || !accessToken) {
       alert("User is not authenticated");
       return;
     }
-  
+
     const formData = new FormData();
     formData.append("userId", userId);
     formData.append("firstName", firstName.trim());
     formData.append("lastName", lastName.trim());
-  
 
     if (picture && picture.startsWith("data:image")) {
       const file = await fetch(picture).then((res) => res.blob());
       formData.append("image", file, "profile.jpg");
     }
-  
+
     try {
       const response = await fetch(
-        `http://localhost:3000/auth/updateUser/${userId}`,
+        `${import.meta.env.VITE_BACKEND_URL}/auth/updateUser/${userId}`,
         {
           method: "PUT",
           headers: {
-            Authorization: `Bearer ${accessToken}`, 
+            Authorization: `Bearer ${accessToken}`,
           },
-          body: formData, 
+          body: formData,
         }
       );
-  
+
       if (!response.ok) {
         throw new Error("Failed to update user");
       }
-  
+
       const data = await response.json();
       console.log(data);
       alert("User updated successfully!");
@@ -83,13 +82,12 @@ export default function GeneralInfoHeader({
       alert("Failed to update user.");
     }
   };
-  
 
   const saveChanges = () => {
     if (!validateInputs()) return;
     setName(`${firstName.trim()} ${lastName.trim()}`);
     setIsEditing(false);
-    updateUser(); 
+    updateUser();
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -97,9 +95,9 @@ export default function GeneralInfoHeader({
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setPicture(reader.result as string); 
+        setPicture(reader.result as string);
       };
-      reader.readAsDataURL(file); 
+      reader.readAsDataURL(file);
     }
   };
 
@@ -190,7 +188,11 @@ export default function GeneralInfoHeader({
           </div>
 
           <div className="actions">
-            <button className="schedule-btn" onClick={saveChanges} disabled={loading}>
+            <button
+              className="schedule-btn"
+              onClick={saveChanges}
+              disabled={loading}
+            >
               {loading ? "Saving..." : "Save"}
             </button>
             <button className="schedule-btn" onClick={toggleEditMode}>

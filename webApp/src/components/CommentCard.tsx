@@ -71,11 +71,11 @@ export default function Comments({
           text: newComment,
           likes: 0,
           rating: 5,
-          picture: `http://localhost:3000${userPicture}`,
+          picture: `${import.meta.env.VITE_BACKEND_URL}${userPicture}`,
         };
 
         const response = await fetch(
-          `http://localhost:3000/addComments/addComment/${chargerId}`,
+          `${import.meta.env.VITE_BACKEND_URL}/addComments/addComment/${chargerId}`,
           {
             method: "POST",
             headers: {
@@ -129,7 +129,7 @@ export default function Comments({
       }
 
       const response = await fetch(
-        `http://localhost:3000/addComments/deleteComment/${chargerId}/${commentId}`,
+        `${import.meta.env.VITE_BACKEND_URL}/addComments/deleteComment/${chargerId}/${commentId}`,
         {
           method: "DELETE",
           headers: {
@@ -163,7 +163,7 @@ export default function Comments({
         }
 
         const response = await fetch(
-          `http://localhost:3000/addComments/updateComment/${chargerId}/${editCommentId}`,
+          `${import.meta.env.VITE_BACKEND_URL}/addComments/updateComment/${chargerId}/${editCommentId}`,
           {
             method: "PUT",
             headers: {
@@ -210,7 +210,7 @@ export default function Comments({
                 <img
                   src={
                     comment.user.picture
-                      ? `http://localhost:3000${comment.user.picture}`
+                      ? `${import.meta.env.VITE_BACKEND_URL}${comment.user.picture}`
                       : "http://localhost:3000/default-profile-picture.png"
                   }
                   alt={`${comment.user.firstName}'s profile`}

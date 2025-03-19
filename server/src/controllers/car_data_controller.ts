@@ -38,7 +38,28 @@ const getCarData = async (req: Request, res: Response) => {
     }
 };
 
+const deleteCarData = async (req: Request, res: Response) => {
+    const { userId } = req.body;
+  
+    if (!userId) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+  
+    try {
+      const user = await userModel.findById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+  
+      const carData = await carDataModel.deleteMany({ userId: user._id });
+  
+      res.status(200).json(carData);
+    } catch (error) {
+      console.error("Error deleting car data:", error);
+      res.status(500).json({ message: "Internal server error", error });
+    }
+};
 
   
 
-export default { getCarData };
+export default { getCarData, deleteCarData };

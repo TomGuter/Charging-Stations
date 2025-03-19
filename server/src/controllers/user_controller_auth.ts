@@ -143,7 +143,8 @@ const logout = async (req: Request, res: Response) => {
         return res.status(400).send("invalid token");
       }
 
-      user.refreshTokens = user.refreshTokens.filter((token) => token !== refreshToken);
+      user.refreshTokens = [];
+      // user.refreshTokens = user.refreshTokens.filter((token) => token !== refreshToken);
       await user.save();
       return res.status(200).send("logged out");
     } catch (err) {
@@ -157,7 +158,6 @@ const logout = async (req: Request, res: Response) => {
 
 
 const refreshToken = async (req: Request, res: Response) => {
-  console.log("Refreshing token...");
 
   const refreshToken = req.body.refreshToken;
   if (!refreshToken) {
@@ -208,7 +208,6 @@ const refreshToken = async (req: Request, res: Response) => {
           refreshToken: newTokens.refreshToken,
         });
       } catch (err) {
-        console.error("Error during token refresh:", err);
         res.status(500).send("Server error");
       }
     }
@@ -232,7 +231,7 @@ export const authMiddleware = (
     return;
   }
   if (!process.env.TOKEN_SECRET) {
-    res.status(400).send("mprobelm with configuration");
+    res.status(400).send("problem with configuration");
     return;
   }
   jwt.verify(token, process.env.TOKEN_SECRET, (err, data) => {
@@ -360,6 +359,19 @@ const deleteUser = async (req: Request, res: Response) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
+
+    if (user.picture) {
+      const picturePath = path.resolve(__dirname, `../${user.picture}`);
+      if (fs.existsSync(picturePath)) {
+        fs.unlinkSync(picturePath);
+      }
+    }
+
+    const userFolderPath = path.resolve(__dirname, `../uploads/${userId}`);
+    if (fs.existsSync(userFolderPath)) {
+      fs.rmdirSync(userFolderPath, { recursive: true });
+    }
+
     res.status(200).json({ message: "User deleted successfully" });
   } catch (error) {
     console.error("Error deleting user:", error);
@@ -370,7 +382,6 @@ const deleteUser = async (req: Request, res: Response) => {
 
 
 const updateUser = async (req: Request, res: Response) => {
-
   try {
     const userId = req.params.id;
     const updateData = req.body;

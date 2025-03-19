@@ -45,5 +45,23 @@ const getCarData = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         res.status(500).json({ message: "Internal server error", error });
     }
 });
-exports.default = { getCarData };
+const deleteCarData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { userId } = req.body;
+    if (!userId) {
+        return res.status(400).json({ message: "User ID is required" });
+    }
+    try {
+        const user = yield user_model_1.default.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        const carData = yield car_data_model_1.default.deleteMany({ userId: user._id });
+        res.status(200).json(carData);
+    }
+    catch (error) {
+        console.error("Error deleting car data:", error);
+        res.status(500).json({ message: "Internal server error", error });
+    }
+});
+exports.default = { getCarData, deleteCarData };
 //# sourceMappingURL=car_data_controller.js.map

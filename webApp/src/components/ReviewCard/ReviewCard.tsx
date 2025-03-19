@@ -48,7 +48,6 @@ interface ReviewCardProps {
 export default function ReviewCard({
   userName,
   location,
-  rating,
   picture,
   comments = [],
   charger,
@@ -60,12 +59,12 @@ export default function ReviewCard({
   const [chargerDislikeCount, setChargerDislikeCount] = useState<number>(0);
 
   useEffect(() => {
-    console.log("charger", charger);
-
     const fetchComments = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3000/addComments/getCommentsByChargerId/${charger._id}`,
+          `${
+            import.meta.env.VITE_BACKEND_URL
+          }/addComments/getCommentsByChargerId/${charger._id}`,
           {
             method: "GET",
             headers: {
@@ -84,7 +83,9 @@ export default function ReviewCard({
           fetchedComments.comments.map(async (comment: Comment) => {
             try {
               const userResponse = await fetch(
-                `http://localhost:3000/auth/getUserById/${comment.userId}`,
+                `${import.meta.env.VITE_BACKEND_URL}/auth/getUserById/${
+                  comment.userId
+                }`,
                 {
                   method: "GET",
                   headers: {
@@ -121,7 +122,40 @@ export default function ReviewCard({
 
     fetchComments();
   }, [charger._id]);
+  useEffect(() => {
+    const fetchLikeAndDisLike = async () => {
+      try {
+        const response = await fetch(
+          `${
+            import.meta.env.VITE_BACKEND_URL
+          }/addChargingStation/getChargerById/${charger._id}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            },
+          }
+        );
+        const data = await response.json();
+        console.log("response data:", data);
 
+        if (!response.ok) {
+          throw new Error("Failed to fetch like and dislike counts.");
+        }
+
+        setChargerLikeCount(data.chargingStation.likes);
+        setChargerDislikeCount(data.chargingStation.dislikes);
+      } catch (error) {
+        console.error("Error fetching like and dislike counts:", error);
+      }
+    };
+
+    if (charger?._id) {
+      fetchLikeAndDisLike();
+    }
+  }, [charger._id]);
+
+  ///////////////////////////////////////////////////////////////////////////////////////////
   const handleToggleCharger = async (type: string) => {
     try {
       const isLike = type === "like";
@@ -133,12 +167,13 @@ export default function ReviewCard({
         like: isLike ? !chargerLiked : false,
         dislike: isDislike ? !chargerDisliked : false,
       };
-      console.log(localStorage.getItem("userId"));
 
       const response = await fetch(
-        `http://localhost:3000/addChargingStation/toggleLikeDislikeCharger`,
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/addChargingStation/toggleLikeDislikeCharger`,
         {
-          method: "POST",
+          method: "PUT",
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
             "Content-Type": "application/json",
@@ -211,12 +246,12 @@ export default function ReviewCard({
 
     setCommentsList(updatedComments);
 
-    console.log("updatedComments", updatedComments);
-
     try {
       const userId = localStorage.getItem("userId");
       const response = await fetch(
-        `http://localhost:3000/addComments/toggleLikeDislikeComment/`,
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/addComments/toggleLikeDislikeComment/`,
         {
           method: "POST",
           headers: {
@@ -235,17 +270,6 @@ export default function ReviewCard({
       if (!response.ok) {
         throw new Error(`Failed to update ${reaction} status`);
       }
-
-      const updatedCommentData = await response.json();
-      const updatedCommentsWithNewCount = commentsList.map((comment) =>
-        comment._id === commentId
-          ? {
-              ...comment,
-              likeCount: updatedCommentData.likeCount,
-              dislikeCount: updatedCommentData.dislikeCount,
-            }
-          : comment
-      );
 
       // setCommentsList(updatedCommentsWithNewCount);
     } catch (error) {
@@ -283,23 +307,6 @@ export default function ReviewCard({
         </div>
       </div>
 
-      <div className="review-rating">
-        <span className="rating-text">Rating: </span>
-        {[...Array(5)].map((_, index) => (
-          <svg
-            key={index}
-            className={`star ${index < rating ? "filled" : ""}`}
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            width="20"
-            height="20"
-          >
-            <path d="M10 15l-5.5 3 1-6-4.5-4 6-1L10 0l2.5 5 6 1-4.5 4 1 6z" />
-          </svg>
-        ))}
-      </div>
-
       <div className="charger-like-section">
         <h4>{charger.name}</h4>
         <p>Location: {charger.location}</p>
@@ -312,8 +319,8 @@ export default function ReviewCard({
               <AiFillLike size={25} color="#007bff" />
             ) : (
               <AiOutlineLike size={25} />
-            )}.
-            {charger.likes}
+            )}
+            {chargerLikeCount}
           </button>
 
           <button
@@ -325,7 +332,7 @@ export default function ReviewCard({
             ) : (
               <AiOutlineDislike size={25} />
             )}
-            {charger.dislikes}
+            {chargerDislikeCount}
           </button>
         </div>
       </div>

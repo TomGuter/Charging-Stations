@@ -5,9 +5,41 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 const commentSchema = new mongoose_1.default.Schema({
+    userId: {
+        type: mongoose_1.default.Schema.Types.ObjectId,
+        ref: "Users",
+    },
     text: {
         type: String,
         required: true,
+    },
+    likes: {
+        type: Number,
+        required: false,
+        default: 0,
+    },
+    dislikes: {
+        type: Number,
+        required: false,
+        default: 0,
+    },
+    likedUsers: [{
+            type: mongoose_1.default.Schema.Types.ObjectId,
+            ref: "Users",
+        }],
+    dislikedUsers: [{
+            type: mongoose_1.default.Schema.Types.ObjectId,
+            ref: "Users",
+        }],
+    Rating: {
+        type: Number,
+        required: false,
+        default: 0,
+    },
+    Date: {
+        type: Date,
+        required: false,
+        default: Date.now,
     },
 });
 const chargingSchema = new mongoose_1.default.Schema({
@@ -51,6 +83,24 @@ const chargingSchema = new mongoose_1.default.Schema({
         type: [commentSchema],
         default: [],
     },
+    likes: {
+        type: Number,
+        required: false,
+        default: 0,
+    },
+    dislikes: {
+        type: Number,
+        required: false,
+        default: 0,
+    },
+    likedUsers: [{
+            type: mongoose_1.default.Schema.Types.ObjectId,
+            ref: "Users",
+        }],
+    dislikedUsers: [{
+            type: mongoose_1.default.Schema.Types.ObjectId,
+            ref: "Users",
+        }],
     userId: {
         type: mongoose_1.default.Schema.Types.ObjectId,
         ref: "Users",

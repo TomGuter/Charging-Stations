@@ -4,8 +4,9 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(to right, #6a11cb, #2575fc);
-  height: auto;
+  background: url("/path-to-your-background-image.jpg");
+  background-size: cover;
+  background-position: center;
 }
 
 .loginContainer {
@@ -13,21 +14,23 @@
   width: 100%;
   max-width: 400px;
   text-align: center;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
 }
 
 .title {
-  font-size: 2.5rem;
-  color: #4a90e2;
+  font-size: 3rem;
+  color: #000000;
   margin-bottom: 1rem;
-  font-weight: bold;
+  font-weight: bolder;
   text-align: center;
-  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  text-shadow: 2px 2px 5px rgba(27, 19, 19, 0.2);
   letter-spacing: 1px;
 }
 
 .subtitle {
   font-size: 1rem;
-  color: #ffffff;
+  color: #333333;
   margin-bottom: 1.5rem;
 }
 
@@ -42,12 +45,12 @@
 }
 
 .input:focus {
-  border-color: #2575fc;
+  border-color: #000000;
   box-shadow: 0 0 8px rgba(37, 117, 252, 0.3);
 }
 
 .button {
-  background: #5e5eef;
+  background: #000000;
   color: #fff;
   border: none;
   padding: 0.8rem;
@@ -57,43 +60,34 @@
   transition: all 0.3s ease;
 }
 
-.button:hover {
-  background: #6a11cb;
-}
-
 .linkContainer {
   margin-top: 1.5rem;
 }
 
 .linkContainer p {
-  color: #ffffff;
+  color: #333333;
   margin-bottom: 0.5rem;
 }
 
 .link {
-  color: #ffffff;
+  color: #000000;
   text-decoration: none;
   font-weight: bold;
   transition: all 0.3s ease;
 }
 
 .link:hover {
-  color: #6a11cb;
+  color: #000000;
   text-decoration: underline;
 }
+
 .form {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: #ffffff;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  background-color: transparent;
+  padding: 1rem;
   width: 100%;
-  max-width: 380px;
   margin: 0 auto;
 }
+
 .error {
   color: red;
   font-size: 14px;
@@ -111,19 +105,13 @@
   visibility: visible;
   opacity: 1;
 }
-/* Inside your CSS or module CSS file */
+
 .googleLogin {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-  width: 100%;
-  max-width: 400px; /* Limit the width */
-  margin: 20px auto; /* Center it horizontally with space around */
+  margin-top: 1rem;
 }
 
 .googleLogin button {
-  background-color: #4285f4; /* Google blue */
+  background-color: #000000;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -134,5 +122,5 @@
 }
 
 .googleLogin button:hover {
-  background-color: #357ae8; /* Darker blue on hover */
+  background-color: #000000;
 }

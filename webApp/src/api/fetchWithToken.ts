@@ -1,4 +1,3 @@
-const BASE_URL = "http://localhost:3000/";
 
 
 const fetchWithToken = async (url: string, options: RequestInit = {}) => {
@@ -15,7 +14,7 @@ const fetchWithToken = async (url: string, options: RequestInit = {}) => {
     }
   
     try {
-      const response = await fetch(`${BASE_URL}${url}`, {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/${url}`, {
         ...options,
         headers, 
         credentials: "include", 
@@ -26,7 +25,7 @@ const fetchWithToken = async (url: string, options: RequestInit = {}) => {
         if (newToken) {
           localStorage.setItem("accessToken", newToken.accessToken);
             console.log("Retrying request with new token", newToken.accessToken);
-          const retryResponse = await fetch(`${BASE_URL}${url}`, {
+          const retryResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/${url}`, {
             ...options,
             headers: {
               ...headers,

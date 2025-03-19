@@ -6,6 +6,12 @@
   max-width: 450px;
   margin: 20px auto;
   font-family: "Arial", sans-serif;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 579px;
+  overflow: auto;
 }
 
 .review-header {
@@ -111,7 +117,7 @@
 
 .add-comment-button {
   padding: 12px 24px;
-  background-color: #4caf50;
+  background-color: #000000;
   color: white;
   border: none;
   border-radius: 8px;
@@ -191,11 +197,11 @@
 }
 
 .like-button {
-  color: #4caf50;
+  color: #2e4bab;
 }
 
 .like-button.active {
-  color: #388e3c;
+  color: #000000;
 }
 
 .dislike-button {
@@ -229,7 +235,7 @@
 .delete-comment-button {
   background-color: red;
   color: white;
-  padding: 8px 12px;
+  padding: 6px 6px;
   border: none;
   cursor: pointer;
   margin-top: 8px;
@@ -239,15 +245,12 @@
   background-color: darkred;
 }
 
-
 .comment-user-picture {
-  width: 30px; 
-  height: 30px; 
-  border-radius: 50%; 
-  background-color: #f0f0f0; 
-  object-fit: cover; 
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: #f0f0f0;
+  object-fit: cover;
   margin-right: 10px;
   border: 2px solid #ddd;
 }
-
-

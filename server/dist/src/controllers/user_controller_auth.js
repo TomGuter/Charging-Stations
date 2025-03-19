@@ -17,6 +17,8 @@ const user_model_1 = __importDefault(require("../models/user_model"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const google_auth_library_1 = require("google-auth-library");
+const fs_1 = __importDefault(require("fs"));
+const path_1 = __importDefault(require("path"));
 const signUp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const firstName = req.body.firstName;
     const lastName = req.body.lastName;
@@ -97,12 +99,13 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             lastName: user.lastName,
             email: user.email,
             _id: user._id,
+            picture: user.picture,
             accessToken: tokens.accessToken,
             refreshToken: tokens.refreshToken,
         });
     }
     catch (err) {
-        res.status(400);
+        res.status(400).send(err);
     }
 });
 const logout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -128,7 +131,8 @@ const logout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 yield user.save();
                 return res.status(400).send("invalid token");
             }
-            user.refreshTokens = user.refreshTokens.filter((token) => token !== refreshToken);
+            user.refreshTokens = [];
+            // user.refreshTokens = user.refreshTokens.filter((token) => token !== refreshToken);
             yield user.save();
             return res.status(200).send("logged out");
         }
@@ -140,48 +144,40 @@ const logout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 const refreshToken = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const refreshToken = req.body.refreshToken;
     if (!refreshToken) {
-        res.status(400).send("invalid token");
+        res.status(400).send("Invalid token");
         return;
     }
     if (!process.env.TOKEN_SECRET) {
-        res.status(400).send("missing auth configuration");
+        res.status(400).send("Missing auth configuration");
         return;
     }
     jsonwebtoken_1.default.verify(refreshToken, process.env.TOKEN_SECRET, (err, data) => __awaiter(void 0, void 0, void 0, function* () {
         if (err) {
-            res.status(403).send("invalid token");
+            res.status(403).send("Invalid token");
             return;
         }
         const payload = data;
         try {
-            const user = yield user_model_1.default.findOne({ _id: payload._id });
-            if (!user) {
-                res.status(400).send("invalid token access");
-                return;
-            }
-            if (!user.refreshTokens || !user.refreshTokens.includes(refreshToken)) {
-                user.refreshTokens = [];
-                yield user.save();
-                res.status(400).send("invalid token access");
+            const user = yield user_model_1.default.findOne({ _id: payload._id }).exec();
+            if (!user || !user.refreshTokens.includes(refreshToken)) {
+                res.status(400).send("Invalid token access");
                 return;
             }
             const newTokens = generateTokens(user._id.toString());
             if (!newTokens) {
-                user.refreshTokens = [];
-                yield user.save();
-                res.status(400).send("pwoblem with configuration");
+                res.status(500).send("Problem with token generation");
                 return;
             }
-            user.refreshTokens = user.refreshTokens.filter((token) => token !== refreshToken);
-            user.refreshTokens.push(newTokens.refreshToken);
-            yield user.save();
+            yield user_model_1.default.updateOne({ _id: user._id }, { $pull: { refreshTokens: refreshToken } });
+            yield user_model_1.default.updateOne({ _id: user._id }, { $push: { refreshTokens: newTokens.refreshToken } });
+            console.log("Token refreshed successfully");
             res.status(200).send({
                 accessToken: newTokens.accessToken,
                 refreshToken: newTokens.refreshToken,
             });
         }
         catch (err) {
-            res.status(400).send("invalid token access");
+            res.status(500).send("Server error");
         }
     }));
 });
@@ -193,7 +189,7 @@ const authMiddleware = (req, res, next) => {
         return;
     }
     if (!process.env.TOKEN_SECRET) {
-        res.status(400).send("mprobelm with configuration");
+        res.status(400).send("problem with configuration");
         return;
     }
     jsonwebtoken_1.default.verify(token, process.env.TOKEN_SECRET, (err, data) => {
@@ -274,5 +270,94 @@ const googleSignIn = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         res.status(400).json({ message: "Google Sign-In failed", error });
     }
 });
-exports.default = { signUp, login, logout, refreshToken, googleSignIn };
+const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const users = yield user_model_1.default.find({});
+        res.status(200).json(users);
+    }
+    catch (error) {
+        console.error("Error fetching users:", error);
+        res.status(500).json({ message: "Internal server error", error });
+    }
+});
+const getUserById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userId = req.params.id;
+        const user = yield user_model_1.default.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.status(200).json(user);
+    }
+    catch (error) {
+        console.error("Error fetching user by ID:", error);
+        res.status(500).json({ message: "Internal server error", error });
+    }
+});
+const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userId = req.params.id;
+        const user = yield user_model_1.default.findByIdAndDelete(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        if (user.picture) {
+            const picturePath = path_1.default.resolve(__dirname, `../${user.picture}`);
+            if (fs_1.default.existsSync(picturePath)) {
+                fs_1.default.unlinkSync(picturePath);
+            }
+        }
+        const userFolderPath = path_1.default.resolve(__dirname, `../uploads/${userId}`);
+        if (fs_1.default.existsSync(userFolderPath)) {
+            fs_1.default.rmdirSync(userFolderPath, { recursive: true });
+        }
+        res.status(200).json({ message: "User deleted successfully" });
+    }
+    catch (error) {
+        console.error("Error deleting user:", error);
+        res.status(500).json({ message: "Internal server error", error });
+    }
+});
+const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userId = req.params.id;
+        const updateData = req.body;
+        const imageFile = req.file;
+        const user = yield user_model_1.default.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        if (imageFile) {
+            const existingPicturePath = path_1.default.resolve(__dirname, `../${user.picture}`);
+            if (fs_1.default.existsSync(existingPicturePath)) {
+                fs_1.default.unlinkSync(existingPicturePath);
+            }
+            updateData.picture = `/uploads/${userId}/${imageFile.filename}`;
+        }
+        const updatedUser = yield user_model_1.default.findByIdAndUpdate(userId, updateData, { new: true });
+        res.status(200).json({ message: "User updated successfully", user: updatedUser });
+    }
+    catch (error) {
+        console.error("Error updating user:", error);
+        res.status(500).json({ message: "Internal server error", error });
+    }
+});
+const verifyAccessToken = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const token = (_a = req.headers['authorization']) === null || _a === void 0 ? void 0 : _a.split(' ')[1];
+    if (!token) {
+        return res.status(401).send({ message: 'Access token is missing' });
+    }
+    const SECRET = process.env.TOKEN_SECRET || '';
+    try {
+        const decoded = jsonwebtoken_1.default.verify(token, SECRET);
+        res.status(200).send({ message: 'Token is valid', decodedToken: decoded });
+    }
+    catch (err) {
+        console.error('Error verifying access token:', err);
+        return res.status(401).send({ message: 'Invalid or expired access token' });
+    }
+});
+exports.default = { signUp, login, logout, refreshToken, googleSignIn, getAllUsers,
+    getUserById, deleteUser, updateUser, verifyAccessToken };
 //# sourceMappingURL=user_controller_auth.js.map

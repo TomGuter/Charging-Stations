@@ -34,7 +34,7 @@ export default function ManageUsers() {
       const accessToken = localStorage.getItem("accessToken");
       try {
         const response = await fetch(
-          "http://localhost:3000/admin/getAllUsers",
+          `${import.meta.env.VITE_BACKEND_URL}/admin/getAllUsers`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -69,7 +69,7 @@ export default function ManageUsers() {
 
     try {
       const response = await fetch(
-        `http://localhost:3000/admin/deleteUser${id}`,
+        `${import.meta.env.VITE_BACKEND_URL}/admin/deleteUser${id}`,
         {
           method: "DELETE",
           headers: {
@@ -101,7 +101,7 @@ export default function ManageUsers() {
       console.log(editedData._id);
       try {
         const response = await fetch(
-          `http://localhost:3000/admin/updateUser/${editedData._id}`,
+          `${import.meta.env.VITE_BACKEND_URL}/admin/updateUser/${editedData._id}`,
           {
             method: "PUT",
             headers: {
@@ -175,7 +175,7 @@ export default function ManageUsers() {
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead
             sx={{
-              backgroundColor: "#1976d2",
+              backgroundColor: "black",
               color: "#fff",
               position: "sticky",
               top: "0",

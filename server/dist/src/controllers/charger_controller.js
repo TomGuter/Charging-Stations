@@ -13,9 +13,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const add_charging_model_1 = __importDefault(require("../models/add_charging_model"));
-const user_model_1 = __importDefault(require("../models/user_model"));
-const mongoose_1 = __importDefault(require("mongoose"));
+const book_a_chrager_model_1 = __importDefault(require("../models/book_a_chrager.model"));
 const axios_1 = __importDefault(require("axios"));
+const fs_1 = __importDefault(require("fs"));
+const path_1 = __importDefault(require("path"));
 const getCoordinates = (address) => __awaiter(void 0, void 0, void 0, function* () {
     const apiKey = process.env.OPENCAGE_API_KEY;
     const url = `${process.env.OPENCAGE_API_URL}=${encodeURIComponent(address)}&key=${apiKey}`;
@@ -25,34 +26,55 @@ const getCoordinates = (address) => __awaiter(void 0, void 0, void 0, function* 
         if (data.results.length > 0) {
             const latitude = data.results[0].geometry.lat;
             const longitude = data.results[0].geometry.lng;
-            console.log('Coordinates:', latitude, longitude);
+            console.log("Coordinates:", latitude, longitude);
             return { latitude, longitude };
         }
         else {
-            console.error('No results found for the given address.');
+            console.error("No results found for the given address.");
             return null;
         }
     }
     catch (error) {
-        console.error('Error fetching coordinates:', error);
+        console.error("Error fetching coordinates:", error);
         return null;
     }
 });
 const addChargingStation = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { location, chargingRate, price, description } = req.body;
-        const coordinates = yield getCoordinates(location);
+        const { userId, location, chargingRate, price, description } = req.body;
+        const imageFile = req.file;
+        if (!userId ||
+            !location ||
+            !chargingRate ||
+            !price ||
+            !description ||
+            !imageFile) {
+            return res
+                .status(400)
+                .json({
+                error: "All fields, including userId and an image, are required.",
+            });
+        }
+        let coordinates;
+        if (req.body.test) {
+            coordinates = { latitude: req.body.latitude, longitude: req.body.longitude };
+        }
+        else {
+            coordinates = yield getCoordinates(location);
+        }
         if (!coordinates) {
-            return res.status(400).json({ error: 'Invalid location' });
+            return res.status(400).json({ error: "Invalid location" });
         }
         const { latitude, longitude } = coordinates;
         const newChargingStation = new add_charging_model_1.default({
+            userId,
             location,
             latitude,
             longitude,
-            price,
-            chargingRate,
+            price: parseFloat(price),
+            chargingRate: parseFloat(chargingRate),
             description,
+            picture: `/uploads/${userId}/${imageFile.filename}`,
         });
         yield newChargingStation.save();
         res.status(201).json({
@@ -82,8 +104,10 @@ const getChargersByUserId = (req, res) => __awaiter(void 0, void 0, void 0, func
     try {
         const { userId } = req.params;
         const chargers = yield add_charging_model_1.default.find({ userId });
-        if (!chargers) {
-            return res.status(404).json({ message: "No charging stations found for this user" });
+        if (!chargers || chargers.length == 0) {
+            return res
+                .status(404)
+                .json({ message: "No charging stations found for this user" });
         }
         res.status(200).json({ chargers });
     }
@@ -94,7 +118,7 @@ const getChargersByUserId = (req, res) => __awaiter(void 0, void 0, void 0, func
 const getAllChargers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const chargers = yield add_charging_model_1.default.find();
-        if (!chargers) {
+        if (!chargers || chargers.length == 0) {
             return res.status(404).json({ message: "No charging stations found" });
         }
         res.status(200).json({ chargers });
@@ -106,52 +130,142 @@ const getAllChargers = (req, res) => __awaiter(void 0, void 0, void 0, function*
 const updateCharger = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { chargerId } = req.params;
-        const updateData = req.body;
         const chargingStation = yield add_charging_model_1.default.findById(chargerId);
         if (!chargingStation) {
             return res.status(404).json({ message: "Charging station not found" });
         }
-        Object.keys(updateData).forEach(key => {
-            chargingStation[key] = updateData[key];
-        });
+        if (req.body.Location && chargingStation.location !== req.body.Location) {
+            const coordinates = yield getCoordinates(req.body.Location);
+            if (coordinates) {
+                chargingStation.latitude = coordinates.latitude;
+                chargingStation.longitude = coordinates.longitude;
+                chargingStation.location = req.body.Location;
+            }
+            else {
+                return res.status(400).json({ message: "Invalid location" });
+            }
+        }
+        if (req.body.ChargingRate)
+            chargingStation.chargingRate = req.body.ChargingRate;
+        if (req.body.Price)
+            chargingStation.price = req.body.Price;
+        if (req.body.Description)
+            chargingStation.description = req.body.Description;
+        if (req.file) {
+            if (chargingStation.picture) {
+                const existingPicturePath = path_1.default.resolve(__dirname, `../${chargingStation.picture}`);
+                if (fs_1.default.existsSync(existingPicturePath)) {
+                    fs_1.default.unlinkSync(existingPicturePath);
+                }
+            }
+            chargingStation.picture = `/uploads/${req.body.userId}/${req.file.filename}`;
+        }
         yield chargingStation.save();
-        res.status(200).json({ message: "Charging station updated successfully", chargingStation });
+        res.status(200).json({
+            message: "Charging station updated successfully",
+            chargingStation,
+        });
     }
     catch (error) {
-        res.status(500).json({ message: "Failed to update charging station", error });
+        console.error("Error updating charging station:", error);
+        res
+            .status(500)
+            .json({ message: "Failed to update charging station", error });
     }
 });
 const deleteChargerById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { chargerId } = req.params;
+        const charger = yield add_charging_model_1.default.findById(chargerId);
+        if (!charger) {
+            return res.status(404).json({ message: "Charging station not found" });
+        }
+        if (charger.picture) {
+            const existingPicturePath = path_1.default.resolve(__dirname, `../${charger.picture}`);
+            if (fs_1.default.existsSync(existingPicturePath)) {
+                fs_1.default.unlinkSync(existingPicturePath);
+            }
+        }
         yield add_charging_model_1.default.findByIdAndDelete(chargerId);
+        yield book_a_chrager_model_1.default.deleteMany({ chargerId });
         res.status(200).json({ message: "Comment deleted successfully" });
     }
     catch (error) {
         res.status(500).json({ message: "Failed to delete comment", error });
     }
 });
-const addSelectedChargingStation = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getUserByChargerId = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { userId, chargerId } = req.params;
-        const user = yield user_model_1.default.findById(userId);
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
+        const { chargerId } = req.params;
         const chargingStation = yield add_charging_model_1.default.findById(chargerId);
         if (!chargingStation) {
             return res.status(404).json({ message: "Charging station not found" });
         }
-        const chargerObjectId = new mongoose_1.default.Types.ObjectId(chargerId);
-        if (!user.selectedChargingStations.includes(chargerObjectId)) {
-            user.selectedChargingStations.push(chargerObjectId);
-            yield user.save();
+        const user = chargingStation.userId;
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
         }
-        res.status(200).json({ message: "Charging station added to user's list successfully", user });
+        res.status(200).json({ user });
     }
     catch (error) {
-        res.status(500).json({ message: "Failed to add charging station to user's list", error });
+        res.status(500).json({ message: "Failed to get user", error });
     }
 });
-exports.default = { addChargingStation, getChargerById, getAllChargers, updateCharger, deleteChargerById, addSelectedChargingStation, getChargersByUserId };
+const toggleLikeDislikeCharger = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
+    const { like, dislike } = req.body;
+    const userId = req.body.userId;
+    const chargerId = req.body.chargerId;
+    try {
+        const charger = yield add_charging_model_1.default.findById(chargerId);
+        if (!charger) {
+            return res.status(404).json({ message: "Charger not found" });
+        }
+        charger.likes = (_a = charger.likes) !== null && _a !== void 0 ? _a : 0;
+        charger.dislikes = (_b = charger.dislikes) !== null && _b !== void 0 ? _b : 0;
+        if (like) {
+            if (charger.likedUsers.includes(userId)) {
+                charger.likes--;
+                charger.likedUsers = charger.likedUsers.filter((id) => !id.equals(userId));
+            }
+            else {
+                charger.likes++;
+                charger.likedUsers.push(userId);
+                if (charger.dislikedUsers.includes(userId)) {
+                    charger.dislikes--;
+                    charger.dislikedUsers = charger.dislikedUsers.filter((id) => !id.equals(userId));
+                }
+            }
+        }
+        if (dislike) {
+            if (charger.dislikedUsers.includes(userId)) {
+                charger.dislikes--;
+                charger.dislikedUsers = charger.dislikedUsers.filter((id) => !id.equals(userId));
+            }
+            else {
+                charger.dislikes++;
+                charger.dislikedUsers.push(userId);
+                if (charger.likedUsers.includes(userId)) {
+                    charger.likes--;
+                    charger.likedUsers = charger.likedUsers.filter((id) => !id.equals(userId));
+                }
+            }
+        }
+        yield charger.save();
+        res.json(charger);
+    }
+    catch (error) {
+        res.status(500).json({ message: "Server error" });
+    }
+});
+exports.default = {
+    addChargingStation,
+    getChargerById,
+    getAllChargers,
+    updateCharger,
+    deleteChargerById,
+    getChargersByUserId,
+    getUserByChargerId,
+    toggleLikeDislikeCharger,
+};
 //# sourceMappingURL=charger_controller.js.map
