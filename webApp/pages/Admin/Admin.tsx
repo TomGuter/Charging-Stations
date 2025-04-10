@@ -3,7 +3,6 @@ import ManageUsers from "../../src/components/Admin/ManageUsers";
 import ManageChargeStations from "../../src/components/Admin/ManageChargingStations";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import React from "react";
 
 
 export default function Admin() {
@@ -20,6 +19,11 @@ export default function Admin() {
 
   // also to add the check if the user id is admin id or not
   useEffect(() => {
+    if (!localStorage.getItem("accessToken")) {
+      navigate("/");
+      return;
+    }
+
     if (firstName === "admin" && lastName === "master" && email === "adminmaster@gmail.com") {
       setIsAdmin(true);
     } else {
@@ -27,7 +31,7 @@ export default function Admin() {
       setShowMessage(true);
 
       setTimeout(() => {
-        navigate("/home"); 
+        navigate("/Home"); 
       }, 1000);
     }
   }, [firstName, lastName, email, navigate]);

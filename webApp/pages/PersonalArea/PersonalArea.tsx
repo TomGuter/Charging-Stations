@@ -4,6 +4,7 @@ import GeneralInfoHeader from "../../src/components/GeneralInfoHeader";
 import ChargeInfo from "../../src/components/ChargeInfo";
 import ReceivedBooking from "../../src/components/RecivedBooking";
 import { Charger, User } from "../../src/types/types";
+import { useNavigate } from "react-router-dom";
 
 interface ChargeInfoRow {
   id: number;
@@ -25,7 +26,15 @@ const PersonalArea: React.FC = () => {
   const [userInfo, setUserInfo] = useState<User | null>(null);
   const [chargers, setChargers] = useState<Charger[]>([]);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
+    const accessToken = localStorage.getItem("accessToken");
+    if (!accessToken) {
+      navigate("/");
+      return;
+    }
+
     const fetchData = async () => {
       const userId = localStorage.getItem("userId");
       const accessToken = localStorage.getItem("accessToken");
@@ -47,8 +56,9 @@ const PersonalArea: React.FC = () => {
         if (!userResponse.ok) {
           throw new Error("Failed to fetch user information");
         }
-
+        
         const userData = await userResponse.json();
+
         setUserInfo({
           firstName: userData.firstName,
           lastName: userData.lastName,
@@ -57,7 +67,6 @@ const PersonalArea: React.FC = () => {
         });
       } catch (error) {
         console.error("Error fetching user information:", error);
-        alert("Failed to fetch user information");
       }
 
       try {

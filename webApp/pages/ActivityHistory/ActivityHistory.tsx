@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -11,6 +11,8 @@ import {
 } from "@mui/material";
 import "./ActivityHistory.css";
 import { Booking } from "../../src/types/types";
+import { useNavigate } from "react-router-dom";
+
 
 type Status = "Pending" | "Confirmed" | "Rejected";
 
@@ -26,7 +28,14 @@ export default function ActivityHistory() {
   const [loading, setLoading] = useState<boolean>(true);
   const userId = localStorage.getItem("userId");
 
+  const navigate = useNavigate();
+
   useEffect(() => {
+    if (!localStorage.getItem("accessToken")) {
+      navigate("/");
+      return;
+    }
+
     const fetchBookings = async () => {
       try {
         const response = await fetch(
@@ -95,7 +104,7 @@ export default function ActivityHistory() {
       </Typography>
       <TableContainer component={Paper} className="table-container">
         <Table stickyHeader>
-          <TableHead>
+        <TableHead style={{ position: "sticky", top: 0 }}>
             <TableRow className="table-header-row">
               <TableCell className="table-header-cell">Date</TableCell>
               <TableCell className="table-header-cell">Start Time</TableCell>
@@ -129,16 +138,15 @@ export default function ActivityHistory() {
                     <img
                       src={
                         row.chargerPicture
-                          ? `http://localhost:3000${row.chargerPicture}`
+                          ? `${import.meta.env.VITE_BACKEND_URL}${row.chargerPicture}`
                           : "defaultPicture"
                       }
                       alt="Charging Station"
                       style={{
                         width: "100px",
-                        height: "100px",
+                        height: "139px",
                         objectFit: "cover",
                         borderRadius: "8px",
-                        marginBottom: "10px",
                       }}
                     />
                   ) : (

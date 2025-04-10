@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
+import { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./Booking.css";
 import ReviewCard from "../../src/components/ReviewCard/ReviewCard";
@@ -281,8 +281,8 @@ export default function Booking() {
             rating={charger.rating || 0}
             picture={
               charger.picture
-                ? `http://localhost:3000${charger.picture}`
-                : "https://www.revixpert.ch/app/uploads/portrait-placeholder.jpg"
+                ? `${import.meta.env.VITE_BACKEND_URL}${charger.picture}`
+                : "https://macelectricco.com/wp-content/uploads/2022/09/Mac-Electric-Featured-Image-Template-5.png"
             }
             charger={charger}
           />

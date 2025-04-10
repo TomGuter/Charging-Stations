@@ -1,8 +1,19 @@
 .table-container {
   margin: 0 auto;
   overflow: auto;
-  max-height: 400px;
+  max-height: 300px;
   position: relative;
+  overflow-x: auto;
+}
+.css-pvu7mv-MuiTable-root {
+  display: table;
+  width: 105%;
+  max-height: 602px;
+  border-collapse: collapse;
+  border-spacing: 0;
+  border-collapse: separate;
+  overflow-y: auto;
+  margin-top: 15px;
 }
 
 .table-container::-webkit-scrollbar {

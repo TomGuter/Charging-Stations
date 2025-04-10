@@ -21,7 +21,7 @@ dotenv.config();
 
 app.use(
   cors({
-    origin: 'http://localhost:5173', 
+    origin: 'https://node127.cs.colman.ac.il', 
     credentials: true,  
   })
 );
@@ -51,7 +51,7 @@ const options = {
       description:
         "REST server including authentication using JWT, CRUD operations on charging stations, comments, and a user registration system.",
     },
-    servers: [{ url: "http://localhost:3000" }],
+    servers: [{ url: "http://localhost:3000" }, {url: "http://10.10.246.127", }, {url: "https://10.10.246.127", }],
   },
   apis: ["./src/routes/*.ts"],
 };
@@ -81,6 +81,11 @@ const moduleApp = async (): Promise<Express> => {
   app.use("/bookings", bookCharger);
   app.use("/carData", carDaraRouter);
   app.use("/admin", adminRouter);
+  app.use(express.static(path.resolve(__dirname, '..', '..', 'front')));
+  console.log("dearname", __dirname);
+  app.get('*', (req, res) => {
+  res.sendFile(path.resolve(__dirname, '..', '..','front', 'index.html'));
+});
 
   return app;
 };

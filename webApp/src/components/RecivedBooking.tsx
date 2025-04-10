@@ -34,7 +34,6 @@ const ReceivedBooking: React.FC<ReceivedBookingProps> = ({ chargers }) => {
         throw new Error("Failed to update booking status on the server");
       }
 
-      const updatedBooking = await response.json();
 
       setBookings((prevBookings) =>
         prevBookings.map((booking) =>
@@ -74,7 +73,6 @@ const ReceivedBooking: React.FC<ReceivedBookingProps> = ({ chargers }) => {
 
       const bookingsData = await bookingsResponse.json();
       setBookings(bookingsData);
-      console.log(bookingsData);
     } catch (error) {
       console.error("Error fetching bookings:", error);
       setBookings([]);
@@ -156,7 +154,7 @@ const ReceivedBooking: React.FC<ReceivedBookingProps> = ({ chargers }) => {
       {!selectedCharger && <p>Please select a charger to view bookings.</p>}
 
       {selectedCharger && (
-        <div className="booking-details">
+        <div className="booking-details"  style={{ width: "60%", overflow: "auto" }}>
           {loading ? (
             <p>Loading...</p>
           ) : bookings.length === 0 ? (

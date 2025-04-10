@@ -267,7 +267,7 @@ router.get("/getChargersByUserId/chargers/:userId", user_controller_auth_1.authM
 router.put("/updateCharger/:chargerId", uploads_1.default.single("image"), user_controller_auth_1.authMiddleware, (req, res) => {
     charger_controller_1.default.updateCharger(req, res);
 });
-router.post("/toggleLikeDislikeCharger/", user_controller_auth_1.authMiddleware, (req, res) => {
+router.put("/toggleLikeDislikeCharger/", user_controller_auth_1.authMiddleware, (req, res) => {
     charger_controller_1.default.toggleLikeDislikeCharger(req, res);
 });
 /**

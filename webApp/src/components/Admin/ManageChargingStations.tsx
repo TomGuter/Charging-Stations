@@ -60,7 +60,6 @@ export default function ManageChargingStations() {
         }
 
         const data = await response.json();
-        console.log("Fetched data:", data);
 
         if (data.chargers && Array.isArray(data.chargers)) {
           const fetchedStations = data.chargers.map(
@@ -87,7 +86,6 @@ export default function ManageChargingStations() {
         }
       } catch (error) {
         console.error("Error fetching charge stations:", error);
-        alert("Failed to fetch charge stations");
       }
     };
 
@@ -133,8 +131,7 @@ export default function ManageChargingStations() {
         throw new Error(`Failed to delete charger: ${response.statusText}`);
       }
 
-      const result = await response.json();
-      console.log("Delete response:", result);
+      await response.json();
 
       setChargingStations((prevStations) =>
         prevStations.filter((station) => station.charherRowId !== charherRowId)
@@ -197,7 +194,6 @@ export default function ManageChargingStations() {
         pictureUrls[editedStation._id] &&
         pictureUrls[editedStation._id].startsWith("data:image")
       ) {
-        console.log("Processing image file...");
         try {
           const file = await fetch(pictureUrls[editedStation._id]).then((res) =>
             res.blob()
@@ -229,8 +225,7 @@ export default function ManageChargingStations() {
         throw new Error(`Failed to save changes: ${response.statusText}`);
       }
 
-      const result = await response.json();
-      console.log("Save response:", result);
+      await response.json();
 
       setEditChargingStation(null);
       alert("Charging station updated successfully!");
@@ -264,10 +259,10 @@ export default function ManageChargingStations() {
   const filteredChargingStations = filterChargingStations();
   const totalChargingStations = filteredChargingStations.length;
 
-  const totalRevenue = filteredChargingStations.reduce(
-    (sum, station) => sum + station.revenue,
-    0
-  );
+  // const totalRevenue = filteredChargingStations.reduce(
+  //   (sum, station) => sum + station.revenue,
+  //   0
+  // );
 
   return (
     <Box sx={{ padding: 3, backgroundColor: "#f5f5f5", borderRadius: 2 }}>
@@ -421,7 +416,7 @@ export default function ManageChargingStations() {
                     />
                   ) : (
                     <img
-                      src={`http://localhost:3000${station.picture}`}
+                      src={`${import.meta.env.VITE_BACKEND_URL}${station.picture}`}
                       alt="Charger"
                       style={{
                         width: "50px",

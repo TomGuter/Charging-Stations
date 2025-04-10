@@ -53,11 +53,10 @@ const refreshAccessToken = async (): Promise<{ accessToken: string; refreshToken
     try {
     const refreshToken = localStorage.getItem("refreshToken");
     if (!refreshToken) {
-      console.error("No refresh token found.");
       return null;
     }
 
-    const response = await fetch(`${BASE_URL}/auth/refresh`, {
+    const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/refresh`, {
       method: "POST",
       credentials: "include", 
       headers: {

@@ -32,7 +32,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const accessToken = localStorage.getItem("accessToken");
 
       if (!accessToken) {
-        console.error("No access token found.");
         setIsAuthenticated(false);
         logout();
         return;
@@ -54,7 +53,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           });
 
           if (refreshResponse.ok) {
-            console.log("Access token refreshed");
             const { accessToken: newAccessToken, refreshToken: newRefreshToken } = await refreshResponse.json();
             localStorage.setItem("accessToken", newAccessToken);
             localStorage.setItem("refreshToken", newRefreshToken);
@@ -70,15 +68,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       } catch (error) {
         console.error("Error during access token verification or refresh:", error);
         setIsAuthenticated(false);
-        navigate("/admin", { replace: true });
+        navigate("/", { replace: true });
       }
     };
 
     checkAccessToken();
 
-    return () => {
-      setIsAuthenticated(false); 
-    };
+
   }, [logout, navigate]);
 
   const checkAuth = () => isAuthenticated;

@@ -3,7 +3,16 @@ import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import "./Home.css";
-import React from "react";
+import L from "leaflet";
+
+
+const userLocationIcon = new L.Icon({
+  iconUrl: "https://cdn-icons-png.flaticon.com/512/64/64113.png", 
+  iconSize: [40, 40], 
+  iconAnchor: [20, 40], 
+  popupAnchor: [0, -35], 
+});
+
 
 interface Comment {
   text: string;
@@ -162,7 +171,6 @@ export default function Home() {
           console.error("No chargers found in response.");
         }
       } catch (error) {
-        console.error("Error fetching charging stations:", error);
       }
     };
 
@@ -276,12 +284,15 @@ export default function Home() {
           {chargingStations.map((charger) => (
             <Marker
               key={charger._id}
-              position={[charger.latitude, charger.longitude]}
+              position={[charger.latitude, charger.longitude]
+              }
+              icon={userLocationIcon}
+
             >
               <Popup>
                 {charger.picture ? (
                   <img
-                    src={`http://localhost:3000${charger.picture}`}
+                    src={`${import.meta.env.VITE_BACKEND_URL}${charger.picture}`}
                     alt="Charging Station"
                     style={{
                       width: "100%",
@@ -294,7 +305,7 @@ export default function Home() {
                 ) : (
                   <p style={{ fontStyle: "italic", color: "gray" }}>
                     <img
-                      src={`https://www.revixpert.ch/app/uploads/portrait-placeholder.jpg`}
+                      src={`${import.meta.env.VITE_BACKEND_URL}/uploads/default_charger.png`}
                       alt="Charging Station"
                       style={{
                         width: "100%",

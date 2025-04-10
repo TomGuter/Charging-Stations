@@ -7,7 +7,6 @@ export const useLogout = () => {
   const logout = async (): Promise<{ message?: string; error?: string }> => {
     const refreshToken = localStorage.getItem("refreshToken");
     if (!refreshToken) {
-      console.error("No refresh token found");
       return { error: "No refresh token found" };
     }
 

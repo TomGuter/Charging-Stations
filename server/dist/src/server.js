@@ -31,7 +31,7 @@ const path_1 = __importDefault(require("path"));
 const app = (0, express_1.default)();
 dotenv_1.default.config();
 app.use((0, cors_1.default)({
-    origin: 'http://localhost:5173',
+    origin: 'https://node127.cs.colman.ac.il',
     credentials: true,
 }));
 const ensureUploadDirectories = () => {
@@ -53,7 +53,7 @@ const options = {
             version: "1.0.0",
             description: "REST server including authentication using JWT, CRUD operations on charging stations, comments, and a user registration system.",
         },
-        servers: [{ url: "http://localhost:3000" }],
+        servers: [{ url: "http://localhost:3000" }, { url: "http://10.10.246.127", }, { url: "https://10.10.246.127", }],
     },
     apis: ["./src/routes/*.ts"],
 };
@@ -80,6 +80,11 @@ const moduleApp = () => __awaiter(void 0, void 0, void 0, function* () {
     app.use("/bookings", book_a_charger_route_1.default);
     app.use("/carData", car_data_route_1.default);
     app.use("/admin", admin_route_1.default);
+    app.use(express_1.default.static(path_1.default.resolve(__dirname, '..', '..', 'front')));
+    console.log("dearname", __dirname);
+    app.get('*', (req, res) => {
+        res.sendFile(path_1.default.resolve(__dirname, '..', '..', 'front', 'index.html'));
+    });
     return app;
 });
 exports.default = moduleApp;

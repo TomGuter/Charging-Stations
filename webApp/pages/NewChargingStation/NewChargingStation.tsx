@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./NewChargingStation.css";
+import { useNavigate } from "react-router-dom";
 
 export default function NewChargingStation() {
   const [location, setLocation] = useState("");
@@ -11,6 +12,16 @@ export default function NewChargingStation() {
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [showLocationOption, setShowLocationOption] = useState(false);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!localStorage.getItem("accessToken")) {
+      navigate("/");
+      return;
+    }
+  }, [navigate]);
+  
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {

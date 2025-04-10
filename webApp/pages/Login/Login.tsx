@@ -77,7 +77,6 @@ const LoginPage: React.FC = () => {
 
       navigate("/Home");
     } catch (error) {
-      console.error("Error:", error);
       setError("Login failed. Please check your credentials.");
     }
   };

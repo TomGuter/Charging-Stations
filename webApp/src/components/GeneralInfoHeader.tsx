@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./generalinfoheader.css";
+import "./GeneralInfoHeader.css";
 
 type GeneralInfoHeaderProps = {
   name: string;
@@ -21,9 +21,17 @@ export default function GeneralInfoHeader({
     lastName: "",
   });
   const [loading, setLoading] = useState(false);
-  const [picture, setPicture] = useState(
-    picturePath ? `http://localhost:3000${picturePath}` : ""
-  );
+  const [picture, setPicture] = useState(() => {
+    if (!picturePath) {
+      return "https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg";
+    }
+    
+    return picturePath.includes("googleusercontent")
+      ? picturePath
+      : `${import.meta.env.VITE_BACKEND_URL}${picturePath}`;
+  });
+  
+  
 
   const toggleEditMode = () => {
     setIsEditing(!isEditing);
@@ -45,6 +53,7 @@ export default function GeneralInfoHeader({
 
     if (!userId || !accessToken) {
       alert("User is not authenticated");
+      setLoading(false);
       return;
     }
 
@@ -74,8 +83,7 @@ export default function GeneralInfoHeader({
         throw new Error("Failed to update user");
       }
 
-      const data = await response.json();
-      console.log(data);
+      await response.json();
       alert("User updated successfully!");
     } catch (error) {
       console.error("Error updating user:", error);
@@ -85,6 +93,7 @@ export default function GeneralInfoHeader({
 
   const saveChanges = () => {
     if (!validateInputs()) return;
+    setLoading(true);
     setName(`${firstName.trim()} ${lastName.trim()}`);
     setIsEditing(false);
     updateUser();
@@ -192,6 +201,8 @@ export default function GeneralInfoHeader({
               className="schedule-btn"
               onClick={saveChanges}
               disabled={loading}
+          
+              
             >
               {loading ? "Saving..." : "Save"}
             </button>

@@ -101,7 +101,7 @@ export default function Comments({
             firstName: localStorage.getItem("firstName") || "", 
             lastName: localStorage.getItem("lastName") || "", 
             email: "",
-            picture:  localStorage.getItem("picture") || "",
+            picture:  "https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg",
           },
           Date: new Date().toLocaleDateString(),
           liked: false,
@@ -207,15 +207,18 @@ export default function Comments({
           comments.map((comment) => (
             <div key={comment._id} className="comment">
               <div className="comment-header">
-                <img
-                  src={
-                    comment.user.picture
-                      ? `http://localhost:3000${comment.user.picture}`
-                      : "http://localhost:3000/default-profile-picture.png"
-                  }
-                  alt={`${comment.user.firstName}'s profile`}
-                  className="comment-user-picture"
-                />
+              <img
+                src={
+                  comment.user.picture?.startsWith("http")
+                    ? comment.user.picture
+                    : comment.user.picture
+                    ? `${import.meta.env.VITE_BACKEND_URL}${comment.user.picture}`
+                    : "https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg"
+                }
+                alt={`${comment.user.firstName}'s profile`}
+                className="comment-user-picture"
+              />
+
                 <p>
                   <strong>{comment.user.firstName} {comment.user.lastName}</strong> -{" "}
                   {new Date(comment.Date).toLocaleDateString()}

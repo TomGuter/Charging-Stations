@@ -239,7 +239,7 @@ export default function ChargeInfo({ rows }: ChargeInfoProps) {
                   </Box>
                 ) : row.picture ? (
                   <img
-                    src={`http://localhost:3000${row.picture}`}
+                    src={`${import.meta.env.VITE_BACKEND_URL}${row.picture}`}
                     alt="Charging Station"
                     style={{
                       width: "50px",

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import  { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -65,7 +65,6 @@ export default function ManageUsers() {
 
   const deleteUser = async (id: number) => {
     const accessToken = localStorage.getItem("accessToken");
-    console.log("Deleting user with ID:", id);
 
     try {
       const response = await fetch(
@@ -84,7 +83,6 @@ export default function ManageUsers() {
       }
 
       setUsers(users.filter((user) => user._id !== id));
-      console.log(`User with ID ${id} deleted successfully`);
     } catch (error) {
       console.error("Error deleting user:", error);
     }
@@ -98,7 +96,6 @@ export default function ManageUsers() {
   const handleSaveEdit = async () => {
     if (editedData) {
       const accessToken = localStorage.getItem("accessToken");
-      console.log(editedData._id);
       try {
         const response = await fetch(
           `${import.meta.env.VITE_BACKEND_URL}/admin/updateUser/${editedData._id}`,

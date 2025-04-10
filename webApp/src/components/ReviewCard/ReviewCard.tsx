@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   AiOutlineLike,
   AiFillLike,
@@ -137,7 +137,6 @@ export default function ReviewCard({
           }
         );
         const data = await response.json();
-        console.log("response data:", data);
 
         if (!response.ok) {
           throw new Error("Failed to fetch like and dislike counts.");

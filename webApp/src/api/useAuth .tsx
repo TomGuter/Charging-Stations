@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import fetchWithToken from "./fetchWithToken";
 import { useLogout } from "./useLogout";
 
-// const BASE_URL = "http://localhost:3000/";
 
 const useAuth = () => {
   const navigate = useNavigate();
@@ -15,7 +14,6 @@ const useAuth = () => {
       const accessToken = localStorage.getItem("accessToken");
 
       if (!accessToken) {
-        console.error("No access token found.");
         logout();
         return;
       }
@@ -36,7 +34,6 @@ const useAuth = () => {
           });
 
           if (refreshResponse.ok) {
-            console.log("Access token refreshed");
             const { accessToken: newAccessToken, refreshToken: newRefreshToken } = await refreshResponse.json();
             localStorage.setItem("accessToken", newAccessToken);
             localStorage.setItem("refreshToken", newRefreshToken);
@@ -51,7 +48,7 @@ const useAuth = () => {
           "Error during access token verification or refresh:",
           error
         );
-        navigate("/admin", { replace: true });
+        navigate("/", { replace: true });
       }
     };
 
