@@ -85,6 +85,7 @@ const LoginPage: React.FC = () => {
     credentialResponse: CredentialResponse
   ) => {
     try {
+      console.log("url is", import.meta.env.VITE_BACKEND_URL);
       const response = await fetch(
         `${import.meta.env.VITE_BACKEND_URL}/auth/logInWithGoogle`,
         {

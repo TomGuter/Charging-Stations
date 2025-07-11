@@ -31,7 +31,7 @@ const path_1 = __importDefault(require("path"));
 const app = (0, express_1.default)();
 dotenv_1.default.config();
 app.use((0, cors_1.default)({
-    origin: 'https://node127.cs.colman.ac.il',
+    origin: 'http://localhost:5173',
     credentials: true,
 }));
 const ensureUploadDirectories = () => {

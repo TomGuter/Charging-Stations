@@ -21,7 +21,7 @@ dotenv.config();
 
 app.use(
   cors({
-    origin: 'https://node127.cs.colman.ac.il', 
+    origin: 'http://localhost:5173',
     credentials: true,  
   })
 );
