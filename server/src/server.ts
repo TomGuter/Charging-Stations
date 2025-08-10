@@ -3,12 +3,14 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import addChargingStation from "./routes/charger_route";
+import addBatteriCharger from "./routes/batteri_charger_route";
 import cors from "cors";
 import addComments from "./routes/commentsOnCharger_route";
 import userRouter from "./routes/user_route";
 import carDaraRouter from "./routes/car_data_route";
 import adminRouter from "./routes/admin_route";
 import bookCharger from "./routes/book_a_charger_route";
+import bookBatteriCharger from "./routes/book_a_batteri_charger_route";
 import swaggerJsDoc from "swagger-jsdoc";
 import swaggerUI from "swagger-ui-express";
 import geminiRouter from "./routes/gemini_route";
@@ -76,9 +78,11 @@ const moduleApp = async (): Promise<Express> => {
 
   app.use("/auth", userRouter);
   app.use("/addChargingStation", addChargingStation);
+  app.use("/addBatteriCharger", addBatteriCharger);
   app.use("/addComments", addComments);
   app.use("/gemini", geminiRouter);
   app.use("/bookings", bookCharger);
+  app.use("/bookingsBatteriCharger", bookBatteriCharger);
   app.use("/carData", carDaraRouter);
   app.use("/admin", adminRouter);
   app.use(express.static(path.resolve(__dirname, '..', '..', 'front')));

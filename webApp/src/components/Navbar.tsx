@@ -9,19 +9,14 @@ import { useAuthContext } from '../api/AuthContext';
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isBatteriUser, setIsBatteriUser] = useState(false);
   const { logout } = useLogout();
   const navigate = useNavigate();
 
-
   const { isAuthenticated } = useAuthContext();
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-
-  const closeMenu = () => {
-    setIsMenuOpen(false);
-  };
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const closeMenu = () => setIsMenuOpen(false);
 
   const handleLogout = async () => {
     logout();
@@ -37,6 +32,12 @@ export default function Navbar() {
       setIsAdmin(true);
     } else {
       setIsAdmin(false);
+    }
+
+    if (email === 'batteri@gmail.com') { // ✅ Check for battery user
+      setIsBatteriUser(true);
+    } else {
+      setIsBatteriUser(false);
     }
   }, []);
 
@@ -71,6 +72,7 @@ export default function Navbar() {
             </NavLink>
           </li>
         )}
+
         <li className={styles.navItem}>
           <NavLink
             to="/Home"
@@ -81,6 +83,19 @@ export default function Navbar() {
             Home
           </NavLink>
         </li>
+
+        {isBatteriUser && (
+          <li className={styles.navItem}>
+            <NavLink
+              to="/addBatteriCharger"
+              className={({ isActive }) => (isActive ? styles.activeLink : styles.navLink)}
+              onClick={() => handleNavLinkClick('/addBatteriCharger')}
+            >
+              Add a battery charger
+            </NavLink>
+          </li>
+        )}
+
         <li className={styles.navItem}>
           <NavLink
             to="/newChargingStation"
@@ -90,6 +105,7 @@ export default function Navbar() {
             Add my own charging station
           </NavLink>
         </li>
+
         <li className={styles.navItem}>
           <NavLink
             to="/ActivityHistory"
@@ -99,6 +115,7 @@ export default function Navbar() {
             Activity history
           </NavLink>
         </li>
+
         <li className={styles.navItem}>
           <NavLink
             to="/PersonalArea"
@@ -109,6 +126,7 @@ export default function Navbar() {
             Personal area
           </NavLink>
         </li>
+
         <li className={styles.navItem}>
           <button
             onClick={() => {
