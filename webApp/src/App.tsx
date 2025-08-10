@@ -10,6 +10,7 @@ import ActivityHistory from "../pages/ActivityHistory/ActivityHistory";
 import PersonalArea from "../pages/PersonalArea/PersonalArea";
 import Booking from "../pages/Booking/Booking";
 import Admin from "../pages/Admin/Admin";
+import Batteri from '../pages/AddBatteriCharger/Batteri';
 import { AuthProvider } from "../src/api/AuthContext";
 
 const App = () => {
@@ -31,6 +32,7 @@ const App = () => {
             <Route path="/PersonalArea" element={<PersonalArea />} />
             <Route path="/Booking" element={<Booking />} />
             <Route path="/Admin" element={<Admin />} />
+            <Route path="/addBatteriCharger" element={<Batteri />} />
           </Routes>
         </>
       </AuthProvider>
