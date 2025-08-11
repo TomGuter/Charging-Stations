@@ -1,8 +1,12 @@
-import mongoose from "mongoose";
-
-const BookCharger = new mongoose.Schema({
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const mongoose_1 = __importDefault(require("mongoose"));
+const BookCharger = new mongoose_1.default.Schema({
     chargerId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose_1.default.Schema.Types.ObjectId,
         ref: "Charging",
         required: true,
     },
@@ -31,10 +35,9 @@ const BookCharger = new mongoose.Schema({
         default: "Pending",
     },
     userId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose_1.default.Schema.Types.ObjectId,
         ref: "Users",
     },
-
     dateLeave: { type: Date, required: true },
     timeLeave: { type: String, required: true },
     currentBatteryLevel: { type: Number, required: true, min: 0, max: 100 },
@@ -52,6 +55,6 @@ const BookCharger = new mongoose.Schema({
     parkLocationFloor: { type: String, required: false },
     note: { type: String, required: false },
 });
-
-const bookBatteriCharger = mongoose.model("BookBatteriCharger", BookCharger);
-export default bookBatteriCharger;
+const bookBatteriCharger = mongoose_1.default.model("BookBatteriCharger", BookCharger);
+exports.default = bookBatteriCharger;
+//# sourceMappingURL=book_batteri_charger_model.js.map

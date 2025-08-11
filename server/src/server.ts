@@ -3,7 +3,6 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import addChargingStation from "./routes/charger_route";
-import addBatteriCharger from "./routes/batteri_charger_route";
 import cors from "cors";
 import addComments from "./routes/commentsOnCharger_route";
 import userRouter from "./routes/user_route";
@@ -78,7 +77,6 @@ const moduleApp = async (): Promise<Express> => {
 
   app.use("/auth", userRouter);
   app.use("/addChargingStation", addChargingStation);
-  app.use("/addBatteriCharger", addBatteriCharger);
   app.use("/addComments", addComments);
   app.use("/gemini", geminiRouter);
   app.use("/bookings", bookCharger);

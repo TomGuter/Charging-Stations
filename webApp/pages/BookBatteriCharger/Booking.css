@@ -1,0 +1,96 @@
+/* עיצוב כללי */
+.booking-page-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 40px 20px;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #f9f9f9;
+}
+.booking-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 450px;
+  background: #fff;
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  max-height: 500px;
+  gap: 2px;
+  overflow: auto;
+}
+
+.booking-form-title {
+  text-align: center;
+  color: #333;
+  margin-bottom: 12px;
+  font-size: 50px;
+  font-weight: bold;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-label {
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.form-input,
+.form-textarea {
+  width: 100%;
+  padding: 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+  transition: all 0.3s;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  border-color: #000;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  outline: none;
+}
+
+.submit-button {
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #000, #444);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-top: 12px;
+}
+
+.submit-button:hover {
+  background: linear-gradient(135deg, #444, #000);
+}
+
+.submit-button:active {
+  transform: scale(0.98);
+}
+
+@media (max-width: 640px) {
+  .booking-form {
+    max-width: 100%;
+  }
+}
+
+.booking-form-title {
+  text-align: center;
+  color: #333;
+  margin-bottom: 12px;
+  font-size: 22px;
+}

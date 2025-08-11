@@ -4,19 +4,61 @@ import BookCharger from "../models/book_batteri_charger_model";
 const bookCharger = async (req: Request, res: Response) => {
   try {
     const {
-      chargerId,
       startTime,
       endTime,
       date,
       message,
       contactNumber,
       userId,
+      chargerId,
+      dateLeave,
+      timeLeave,
+      currentBatteryLevel,
+      desiredBatteryLevel,
+      parkLocationSpotId,
+      sendSmsOnComplete,
+      sitePicker,
+      vehicleModel,
+      vehicleLicensePlate,
+      vehicleYear,
+      vehicleColor,
+      vehicleDriverFullName,
+      dialCode,
+      vehicleDriverPhoneNumber,
+      parkLocationFloor,
+      note,
     } = req.body;
 
+    const parsedDateLeave = new Date(dateLeave);
+    if (isNaN(parsedDateLeave.getTime())) {
+      return res.status(400).json({ message: "Invalid dateLeave format" });
+    }
 
-    const parsedStartTime = new Date(`${date}T${startTime}:00`);
-    const parsedEndTime = new Date(`${date}T${endTime}:00`);
-    const parsedDate = new Date(date); 
+    const normalizedTimeLeave = String(timeLeave).trim();
+    const parsedCurrentBatteryLevel = Number(currentBatteryLevel);
+    const parsedDesiredBatteryLevel = Number(desiredBatteryLevel);
+    const parsedVehicleYear =
+      vehicleYear !== undefined && vehicleYear !== ""
+        ? Number(vehicleYear)
+        : undefined;
+
+    if (
+      Number.isNaN(parsedCurrentBatteryLevel) ||
+      Number.isNaN(parsedDesiredBatteryLevel)
+    ) {
+      return res.status(400).json({ message: "Battery levels must be numbers" });
+    }
+
+    const parsedSendSmsOnComplete =
+      typeof sendSmsOnComplete === "boolean"
+        ? sendSmsOnComplete
+        : String(sendSmsOnComplete).toLowerCase() === "true";
+
+    const parsedDate = date ? new Date(date) : undefined;
+    const parsedStartTime =
+      date && startTime ? new Date(`${date}T${startTime}:00`) : undefined;
+    const parsedEndTime =
+      date && endTime ? new Date(`${date}T${endTime}:00`) : undefined;
 
     const booking = new BookCharger({
       chargerId,
@@ -26,10 +68,25 @@ const bookCharger = async (req: Request, res: Response) => {
       Message: message,
       contactNumber,
       userId,
+      dateLeave: parsedDateLeave,
+      timeLeave: normalizedTimeLeave,
+      currentBatteryLevel: parsedCurrentBatteryLevel,
+      desiredBatteryLevel: parsedDesiredBatteryLevel,
+      sitePicker: String(sitePicker).trim(),
+      vehicleModel: String(vehicleModel).trim(),
+      vehicleLicensePlate: String(vehicleLicensePlate).trim(),
+      vehicleDriverFullName: String(vehicleDriverFullName).trim(),
+      dialCode: String(dialCode).trim(),
+      vehicleDriverPhoneNumber: String(vehicleDriverPhoneNumber).trim(),
+      parkLocationSpotId: parkLocationSpotId || undefined,
+      sendSmsOnComplete: parsedSendSmsOnComplete,
+      vehicleYear: parsedVehicleYear,
+      vehicleColor: vehicleColor || undefined,
+      parkLocationFloor: parkLocationFloor || undefined,
+      note: note || undefined,
     });
 
     await booking.save();
-
     res.status(201).json({ message: "Charger booked successfully" });
   } catch (error) {
     res.status(500).json({ message: "Failed to book charger", error });
