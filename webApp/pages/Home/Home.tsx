@@ -5,14 +5,24 @@ import "leaflet/dist/leaflet.css";
 import "./Home.css";
 import L from "leaflet";
 
-
 const userLocationIcon = new L.Icon({
-  iconUrl: "https://cdn-icons-png.flaticon.com/512/64/64113.png", 
-  iconSize: [40, 40], 
-  iconAnchor: [20, 40], 
-  popupAnchor: [0, -35], 
+  iconUrl: "https://cdn-icons-png.flaticon.com/512/64/64113.png",
+  iconSize: [40, 40],
+  iconAnchor: [20, 40],
+  popupAnchor: [0, -35],
 });
 
+const batteriIcon = new L.Icon({
+  iconUrl:
+    "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png",
+  shadowUrl:
+    "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+  shadowAnchor: [12, 41],
+});
 
 interface Comment {
   text: string;
@@ -30,18 +40,17 @@ interface ChargingStation {
   description: string;
   comments?: Comment[];
   userId: string;
+  chargerType?: string;
 }
 
 function MapUpdater({ coordinates }: { coordinates: { lat: number; lng: number } | null }) {
   const map = useMap();
-
   useEffect(() => {
     if (coordinates) {
-      map.flyTo([coordinates.lat, coordinates.lng], 14); 
+      map.flyTo([coordinates.lat, coordinates.lng], 14);
     }
   }, [coordinates, map]);
-
-  return null; 
+  return null;
 }
 
 function ReturnToLocationButton({
@@ -50,7 +59,6 @@ function ReturnToLocationButton({
   userLocation: { lat: number; lng: number } | null;
 }) {
   const map = useMap();
-
   const goToCurrentLocation = () => {
     if (userLocation) {
       map.flyTo([userLocation.lat, userLocation.lng], 14);
@@ -81,38 +89,23 @@ function ReturnToLocationButton({
   );
 }
 
-function calculateChargingTime(
-  batteryCapacity: number,
-  chargingSpeed: number
-): string {
-  if (!batteryCapacity || !chargingSpeed) {
-    return "N/A";
-  }
-
+function calculateChargingTime(batteryCapacity: number, chargingSpeed: number): string {
+  if (!batteryCapacity || !chargingSpeed) return "N/A";
   const timeInHours = batteryCapacity / chargingSpeed;
   const hours = Math.floor(timeInHours);
   const minutes = Math.round((timeInHours - hours) * 60);
-
   return `${hours} hours ${minutes} minutes`;
 }
 
 export default function Home() {
   const navigate = useNavigate();
   const location = useLocation();
-  const message = location.state?.message;
+  const message = (location as any).state?.message;
 
-  const [coordinates, setCoordinates] = useState<{
-    lat: number;
-    lng: number;
-  } | null>(null);
-  const [userLocation, setUserLocation] = useState<{
-    lat: number;
-    lng: number;
-  } | null>(null);
+  const [coordinates, setCoordinates] = useState<{ lat: number; lng: number } | null>(null);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [address, setAddress] = useState<string>("");
-  const [chargingStations, setChargingStations] = useState<ChargingStation[]>(
-    []
-  );
+  const [chargingStations, setChargingStations] = useState<ChargingStation[]>([]);
   const [carData, setCarData] = useState<{
     batteryCapacity: number;
     brandName: string;
@@ -120,22 +113,14 @@ export default function Home() {
     carModel: string;
   } | null>(null);
 
-  const [userName, setUserName] = useState<{
-    firstName: string;
-    lastName: string;
-  } | null>(null);
+  const [userName, setUserName] = useState<{ firstName: string; lastName: string } | null>(null);
 
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
-    if (!accessToken) {
+    if (!accessToken || !localStorage.getItem("refreshToken")) {
       navigate("/");
       return;
     }
-    if (!localStorage.getItem("refreshToken")) {
-      navigate("/");
-      return;
-    }
-
     const firstName = localStorage.getItem("firstName");
     const lastName = localStorage.getItem("lastName");
     if (firstName && lastName) {
@@ -171,6 +156,7 @@ export default function Home() {
           console.error("No chargers found in response.");
         }
       } catch (error) {
+        console.error("Failed to fetch chargers:", error);
       }
     };
 
@@ -281,29 +267,30 @@ export default function Home() {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          {chargingStations.map((charger) => (
-            <Marker
-              key={charger._id}
-              position={[charger.latitude, charger.longitude]
-              }
-              icon={userLocationIcon}
+          {chargingStations.map((charger) => {
+            const isBatteri = charger.chargerType?.toLowerCase() === "batteri";
+            const targetPath = isBatteri ? "/BatteriBooking" : "/Booking";
 
-            >
-              <Popup>
-                {charger.picture ? (
-                  <img
-                    src={`${import.meta.env.VITE_BACKEND_URL}${charger.picture}`}
-                    alt="Charging Station"
-                    style={{
-                      width: "100%",
-                      height: "150px",
-                      objectFit: "cover",
-                      borderRadius: "8px",
-                      marginBottom: "10px",
-                    }}
-                  />
-                ) : (
-                  <p style={{ fontStyle: "italic", color: "gray" }}>
+            return (
+              <Marker
+                key={charger._id}
+                position={[charger.latitude, charger.longitude]}
+                icon={isBatteri ? batteriIcon : userLocationIcon}
+              >
+                <Popup>
+                  {charger.picture ? (
+                    <img
+                      src={`${import.meta.env.VITE_BACKEND_URL}${charger.picture}`}
+                      alt="Charging Station"
+                      style={{
+                        width: "100%",
+                        height: "150px",
+                        objectFit: "cover",
+                        borderRadius: "8px",
+                        marginBottom: "10px",
+                      }}
+                    />
+                  ) : (
                     <img
                       src={`${import.meta.env.VITE_BACKEND_URL}/uploads/default_charger.png`}
                       alt="Charging Station"
@@ -315,59 +302,70 @@ export default function Home() {
                         marginBottom: "10px",
                       }}
                     />
-                    No image available
-                  </p>
-                )}
-                <strong>{charger.location}</strong>
-                <br />
-                <br />
-                Price: ${charger.price}
-                <br />
-                Rating: {charger.rating} stars
-                <br />
-                Charging Speed: {charger.chargingRate}kW
-                <br />
-                Charging Time:{" "}
-                {carData?.batteryCapacity && charger.chargingRate ? (
-                  <>
-                    <strong>
-                      {calculateChargingTime(
-                        carData.batteryCapacity,
-                        charger.chargingRate
-                      )}
-                    </strong>
-                    <div>
-                      (based on {carData.brandName} {carData.carModel}{" "}
-                      {carData.year})
+                  )}
+                  <strong>{charger.location}</strong>
+                  <br />
+                  <br />
+                  Price: ${charger.price}
+                  <br />
+                  Rating: {charger.rating} stars
+                  <br />
+                  Charging Speed: {charger.chargingRate}kW
+                  <br />
+                  Charging Time:{" "}
+                  {carData?.batteryCapacity && charger.chargingRate ? (
+                    <>
+                      <strong>
+                        {calculateChargingTime(
+                          carData.batteryCapacity,
+                          charger.chargingRate
+                        )}
+                      </strong>
+                      <div>
+                        (based on {carData.brandName} {carData.carModel}{" "}
+                        {carData.year})
+                      </div>
+                    </>
+                  ) : (
+                    "N/A"
+                  )}
+                  <br />
+                  {isBatteri && (
+                    <div
+                      style={{
+                        marginTop: "8px",
+                        padding: "8px",
+                        borderRadius: "6px",
+                        background: "#eef8ff",
+                        borderLeft: "4px solid #066C91",
+                        fontWeight: 600,
+                      }}
+                    >
+                      BatteRi Charger
                     </div>
-                  </>
-                ) : (
-                  "N/A"
-                )}
-                <br />
-                <button
-                  onClick={() => {
-                    navigate("/Booking", { state: { charger } });
-                  }}
-                  style={{
-                    backgroundColor: "#066C91",
-                    color: "white",
-                    padding: "10px 20px",
-                    border: "none",
-                    borderRadius: "8px",
-                    cursor: "pointer",
-                    marginTop: "10px",
-                  }}
-                >
-                  Book Now
-                </button>
-              </Popup>
-            </Marker>
-          ))}
-
+                  )}
+                  <button
+                    onClick={() => {
+                      navigate(targetPath, { state: { charger } });
+                    }}
+                    style={{
+                      backgroundColor: "#066C91",
+                      color: "white",
+                      padding: "10px 20px",
+                      border: "none",
+                      borderRadius: "8px",
+                      cursor: "pointer",
+                      marginTop: "10px",
+                    }}
+                  >
+                    Book Now
+                  </button>
+                </Popup>
+              </Marker>
+            );
+          })}
           <ReturnToLocationButton userLocation={userLocation} />
           <MapUpdater coordinates={coordinates} />
-
         </MapContainer>
       )}
     </div>

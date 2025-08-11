@@ -9,6 +9,7 @@ import NewChargingStation from "../pages/NewChargingStation/NewChargingStation";
 import ActivityHistory from "../pages/ActivityHistory/ActivityHistory";
 import PersonalArea from "../pages/PersonalArea/PersonalArea";
 import Booking from "../pages/Booking/Booking";
+import BatteriBooking from "../pages/BookBatteriCharger/Booking";
 import Admin from "../pages/Admin/Admin";
 import Batteri from '../pages/AddBatteriCharger/Batteri';
 import { AuthProvider } from "../src/api/AuthContext";
@@ -31,6 +32,7 @@ const App = () => {
             <Route path="/ActivityHistory" element={<ActivityHistory />} />
             <Route path="/PersonalArea" element={<PersonalArea />} />
             <Route path="/Booking" element={<Booking />} />
+            <Route path="/BatteriBooking" element={<BatteriBooking />} />
             <Route path="/Admin" element={<Admin />} />
             <Route path="/addBatteriCharger" element={<Batteri />} />
           </Routes>
