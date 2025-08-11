@@ -23,6 +23,7 @@ const user_route_1 = __importDefault(require("./routes/user_route"));
 const car_data_route_1 = __importDefault(require("./routes/car_data_route"));
 const admin_route_1 = __importDefault(require("./routes/admin_route"));
 const book_a_charger_route_1 = __importDefault(require("./routes/book_a_charger_route"));
+const book_a_batteri_charger_route_1 = __importDefault(require("./routes/book_a_batteri_charger_route"));
 const swagger_jsdoc_1 = __importDefault(require("swagger-jsdoc"));
 const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
 const gemini_route_1 = __importDefault(require("./routes/gemini_route"));
@@ -78,6 +79,7 @@ const moduleApp = () => __awaiter(void 0, void 0, void 0, function* () {
     app.use("/addComments", commentsOnCharger_route_1.default);
     app.use("/gemini", gemini_route_1.default);
     app.use("/bookings", book_a_charger_route_1.default);
+    app.use("/bookingsBatteriCharger", book_a_batteri_charger_route_1.default);
     app.use("/carData", car_data_route_1.default);
     app.use("/admin", admin_route_1.default);
     app.use(express_1.default.static(path_1.default.resolve(__dirname, '..', '..', 'front')));

@@ -79,6 +79,11 @@ const chargingSchema = new mongoose_1.default.Schema({
         type: String,
         required: false,
     },
+    chargerType: {
+        type: String,
+        required: false,
+        default: "none",
+    },
     comments: {
         type: [commentSchema],
         default: [],
