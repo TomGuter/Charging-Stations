@@ -1,6 +1,43 @@
 import { Request, Response } from "express";
 import BookCharger from "../models/book_a_chrager.model";
 
+
+// const bookCharger = async (req: Request, res: Response) => {
+//   try {
+//     const {
+//       chargerId,
+//       startTime,
+//       endTime,
+//       date,
+//       message,
+//       contactNumber,
+//       userId,
+//     } = req.body;
+
+
+//     const parsedStartTime = new Date(`${date}T${startTime}:00`);
+//     const parsedEndTime = new Date(`${date}T${endTime}:00`);
+//     const parsedDate = new Date(date); 
+
+//     const booking = new BookCharger({
+//       chargerId,
+//       StartTime: parsedStartTime,
+//       EndTime: parsedEndTime,
+//       Date: parsedDate,
+//       Message: message,
+//       contactNumber,
+//       userId,
+//     });
+
+//     await booking.save();
+
+//     res.status(201).json({ message: "Charger booked successfully" });
+//   } catch (error) {
+//     res.status(500).json({ message: "Failed to book charger", error });
+//   }
+// };
+
+
 const bookCharger = async (req: Request, res: Response) => {
   try {
     const {
@@ -11,12 +48,73 @@ const bookCharger = async (req: Request, res: Response) => {
       message,
       contactNumber,
       userId,
+
+      dateLeave,
+      timeLeave,
+      currentBatteryLevel,
+      desiredBatteryLevel,
+      parkLocationSpotId,
+      sendSmsOnComplete,
+      sitePicker,
+      vehicleModel,
+      vehicleLicensePlate,
+      vehicleYear,
+      vehicleColor,
+      vehicleDriverFullName,
+      dialCode,
+      vehicleDriverPhoneNumber,
+      parkLocationFloor,
+      note,
     } = req.body;
 
+    const parsedDate = date ? new Date(date) : undefined;
+    const parsedStartTime =
+      date && startTime ? new Date(`${date}T${startTime}:00`) : undefined;
+    const parsedEndTime =
+      date && endTime ? new Date(`${date}T${endTime}:00`) : undefined;
 
-    const parsedStartTime = new Date(`${date}T${startTime}:00`);
-    const parsedEndTime = new Date(`${date}T${endTime}:00`);
-    const parsedDate = new Date(date); 
+    const parsedDateLeave = dateLeave ? new Date(dateLeave) : undefined;
+    if (parsedDateLeave !== undefined && isNaN(parsedDateLeave.getTime())) {
+      return res.status(400).json({ message: "Invalid dateLeave format" });
+    }
+
+    const normalizedTimeLeave =
+      timeLeave !== undefined && timeLeave !== null
+        ? String(timeLeave).trim()
+        : undefined;
+
+    const parsedCurrentBatteryLevel =
+      currentBatteryLevel !== undefined && currentBatteryLevel !== ""
+        ? Number(currentBatteryLevel)
+        : undefined;
+
+    const parsedDesiredBatteryLevel =
+      desiredBatteryLevel !== undefined && desiredBatteryLevel !== ""
+        ? Number(desiredBatteryLevel)
+        : undefined;
+
+    if (
+      (currentBatteryLevel !== undefined &&
+        Number.isNaN(parsedCurrentBatteryLevel)) ||
+      (desiredBatteryLevel !== undefined &&
+        Number.isNaN(parsedDesiredBatteryLevel))
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Battery levels must be numbers" });
+    }
+
+    const parsedVehicleYear =
+      vehicleYear !== undefined && vehicleYear !== ""
+        ? Number(vehicleYear)
+        : undefined;
+
+    const parsedSendSmsOnComplete =
+      typeof sendSmsOnComplete === "boolean"
+        ? sendSmsOnComplete
+        : typeof sendSmsOnComplete === "string"
+        ? sendSmsOnComplete.toLowerCase() === "true"
+        : undefined;
 
     const booking = new BookCharger({
       chargerId,
@@ -26,15 +124,40 @@ const bookCharger = async (req: Request, res: Response) => {
       Message: message,
       contactNumber,
       userId,
+
+      dateLeave: parsedDateLeave,
+      timeLeave: normalizedTimeLeave,
+      currentBatteryLevel: parsedCurrentBatteryLevel,
+      desiredBatteryLevel: parsedDesiredBatteryLevel,
+      sitePicker: sitePicker !== undefined ? String(sitePicker).trim() : undefined,
+      vehicleModel: vehicleModel !== undefined ? String(vehicleModel).trim() : undefined,
+      vehicleLicensePlate:
+        vehicleLicensePlate !== undefined ? String(vehicleLicensePlate).trim() : undefined,
+      vehicleDriverFullName:
+        vehicleDriverFullName !== undefined ? String(vehicleDriverFullName).trim() : undefined,
+      dialCode: dialCode !== undefined ? String(dialCode).trim() : undefined,
+      vehicleDriverPhoneNumber:
+        vehicleDriverPhoneNumber !== undefined
+          ? String(vehicleDriverPhoneNumber).trim()
+          : undefined,
+      parkLocationSpotId: parkLocationSpotId || undefined,
+      sendSmsOnComplete: parsedSendSmsOnComplete,
+      vehicleYear: parsedVehicleYear,
+      vehicleColor: vehicleColor || undefined,
+      parkLocationFloor: parkLocationFloor || undefined,
+      note: note || undefined,
     });
 
     await booking.save();
-
-    res.status(201).json({ message: "Charger booked successfully" });
+    res
+      .status(201)
+      .json({ message: "Charger booked successfully", id: booking._id });
   } catch (error) {
     res.status(500).json({ message: "Failed to book charger", error });
   }
 };
+
+
 
 const getAllBookings = async (req: Request, res: Response) => {
   try {

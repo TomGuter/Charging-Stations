@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./Batteri.css"; 
+import "./Batteri.css";
 
-// email: battei@gmail.com
+// email: batteri@gmail.com
 // password: battericharger
 
 export default function Batteri() {
-  const [isBatteriUser, setIsBatteriUser] = useState<boolean | null>(null);
+  const [hasAccess, setHasAccess] = useState<boolean | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -16,17 +16,26 @@ export default function Batteri() {
       return;
     }
 
-    const email = localStorage.getItem("email");
-    const allowed = email === "batteri@gmail.com";
-    setIsBatteriUser(allowed);
+    const email = (localStorage.getItem("email") || "").toLowerCase();
+    const firstName = localStorage.getItem("firstName") || "";
+    const lastName = localStorage.getItem("lastName") || "";
+
+    const isBatteriUser = email === "batteri@gmail.com";
+    const isAdmin =
+      firstName === "admin" &&
+      lastName === "master" &&
+      email === "adminmaster@gmail.com";
+
+    const allowed = isBatteriUser || isAdmin;
+    setHasAccess(allowed);
 
     if (!allowed) {
-      navigate("/home", { replace: true }); 
+      navigate("/Home", { replace: true });
     }
   }, [navigate]);
 
-  if (isBatteriUser === null) return null;
-  if (!isBatteriUser) return null;
+  if (hasAccess === null) return null;
+  if (!hasAccess) return null;
 
   return <div style={{ color: "red" }}>Add a Battery Charger</div>;
 }

@@ -3,8 +3,8 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { FaUser, FaHome } from 'react-icons/fa';
 import { MdExitToApp } from 'react-icons/md';
 import { useState, useEffect, useCallback } from 'react';
-import { useLogout } from '../api/useLogout'; 
-import { useAuthContext } from '../api/AuthContext'; 
+import { useLogout } from '../api/useLogout';
+import { useAuthContext } from '../api/AuthContext';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -20,7 +20,7 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     logout();
-    closeMenu(); 
+    closeMenu();
   };
 
   useEffect(() => {
@@ -34,7 +34,7 @@ export default function Navbar() {
       setIsAdmin(false);
     }
 
-    if (email === 'batteri@gmail.com') { // ✅ Check for battery user
+    if (email === 'batteri@gmail.com') {
       setIsBatteriUser(true);
     } else {
       setIsBatteriUser(false);
@@ -47,11 +47,14 @@ export default function Navbar() {
         navigate(to);
         closeMenu();
       } else {
-        navigate('/'); 
+        navigate('/');
       }
     },
     [isAuthenticated, navigate]
   );
+
+  const canAddBatteri = isBatteriUser || isAdmin;
+  const hideForBatteriOnly = isBatteriUser && !isAdmin;
 
   return (
     <nav className={styles.navbar}>
@@ -84,7 +87,7 @@ export default function Navbar() {
           </NavLink>
         </li>
 
-        {isBatteriUser && (
+        {canAddBatteri && (
           <li className={styles.navItem}>
             <NavLink
               to="/addBatteriCharger"
@@ -96,25 +99,30 @@ export default function Navbar() {
           </li>
         )}
 
-        <li className={styles.navItem}>
-          <NavLink
-            to="/newChargingStation"
-            className={({ isActive }) => (isActive ? styles.activeLink : styles.navLink)}
-            onClick={() => handleNavLinkClick('/newChargingStation')}
-          >
-            Add my own charging station
-          </NavLink>
-        </li>
+        {/* Hide these two for batteri-only users */}
+        {!hideForBatteriOnly && (
+          <li className={styles.navItem}>
+            <NavLink
+              to="/newChargingStation"
+              className={({ isActive }) => (isActive ? styles.activeLink : styles.navLink)}
+              onClick={() => handleNavLinkClick('/newChargingStation')}
+            >
+              Add my own charging station
+            </NavLink>
+          </li>
+        )}
 
-        <li className={styles.navItem}>
-          <NavLink
-            to="/ActivityHistory"
-            className={({ isActive }) => (isActive ? styles.activeLink : styles.navLink)}
-            onClick={() => handleNavLinkClick('/ActivityHistory')}
-          >
-            Activity history
-          </NavLink>
-        </li>
+        {!hideForBatteriOnly && (
+          <li className={styles.navItem}>
+            <NavLink
+              to="/ActivityHistory"
+              className={({ isActive }) => (isActive ? styles.activeLink : styles.navLink)}
+              onClick={() => handleNavLinkClick('/ActivityHistory')}
+            >
+              Activity history
+            </NavLink>
+          </li>
+        )}
 
         <li className={styles.navItem}>
           <NavLink
