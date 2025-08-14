@@ -34,10 +34,8 @@ const getCoordinates = async (address: string) => {
 
 const addChargingStation = async (req: Request, res: Response) => {
   try {
-    const { userId, location, chargingRate, price, description } = req.body;
+    const { userId, location, chargingRate, price, description, chargerType } = req.body;
     const imageFile = req.file;
-
-
     if (
       !userId ||
       !location ||
@@ -75,6 +73,7 @@ const addChargingStation = async (req: Request, res: Response) => {
       chargingRate: parseFloat(chargingRate),
       description,
       picture: `/uploads/${userId}/${imageFile.filename}`,
+      chargerType
     });
 
     await newChargingStation.save();
