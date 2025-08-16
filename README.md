@@ -1,4 +1,4 @@
-# Full Stack Application
+# Charging Stations Project
 
 This repository contains a **server** (backend) and **webApp** (frontend).  
 The backend is built with **Node.js, TypeScript, Express, MongoDB**, while the frontend uses **React, Vite, and TypeScript**.
