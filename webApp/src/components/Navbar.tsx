@@ -1,10 +1,10 @@
-import styles from './Navbar.module.css';
-import { NavLink, useNavigate } from 'react-router-dom';
-import { FaUser, FaHome } from 'react-icons/fa';
-import { MdExitToApp } from 'react-icons/md';
-import { useState, useEffect, useCallback } from 'react';
-import { useLogout } from '../api/useLogout';
-import { useAuthContext } from '../api/AuthContext';
+import styles from "./Navbar.module.css";
+import { NavLink, useNavigate } from "react-router-dom";
+import { FaUser, FaHome } from "react-icons/fa";
+import { MdExitToApp } from "react-icons/md";
+import { useState, useEffect, useCallback } from "react";
+import { useLogout } from "../api/useLogout";
+import { useAuthContext } from "../api/AuthContext";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -24,17 +24,21 @@ export default function Navbar() {
   };
 
   useEffect(() => {
-    const firstName = localStorage.getItem('firstName');
-    const lastName = localStorage.getItem('lastName');
-    const email = localStorage.getItem('email');
+    const firstName = localStorage.getItem("firstName");
+    const lastName = localStorage.getItem("lastName");
+    const email = localStorage.getItem("email");
 
-    if (firstName === 'admin' && lastName === 'master' && email === 'adminmaster@gmail.com') {
+    if (
+      firstName === "admin" &&
+      lastName === "master" &&
+      email === "adminmaster@gmail.com"
+    ) {
       setIsAdmin(true);
     } else {
       setIsAdmin(false);
     }
 
-    if (email === 'batteri@gmail.com') {
+    if (email === "batteri@gmail.com") {
       setIsBatteriUser(true);
     } else {
       setIsBatteriUser(false);
@@ -47,7 +51,7 @@ export default function Navbar() {
         navigate(to);
         closeMenu();
       } else {
-        navigate('/');
+        navigate("/");
       }
     },
     [isAuthenticated, navigate]
@@ -63,13 +67,15 @@ export default function Navbar() {
         <div></div>
         <div></div>
       </div>
-      <ul className={`${styles.navList} ${isMenuOpen ? styles.active : ''}`}>
+      <ul className={`${styles.navList} ${isMenuOpen ? styles.active : ""}`}>
         {isAdmin && (
           <li className={styles.navItem}>
             <NavLink
               to="/Admin"
-              className={({ isActive }) => (isActive ? styles.activeLink : styles.navLink)}
-              onClick={() => handleNavLinkClick('/Admin')}
+              className={({ isActive }) =>
+                isActive ? styles.activeLink : styles.navLink
+              }
+              onClick={() => handleNavLinkClick("/Admin")}
             >
               Admin
             </NavLink>
@@ -79,10 +85,12 @@ export default function Navbar() {
         <li className={styles.navItem}>
           <NavLink
             to="/Home"
-            className={({ isActive }) => (isActive ? styles.activeLink : styles.navLink)}
-            onClick={() => handleNavLinkClick('/Home')}
+            className={({ isActive }) =>
+              isActive ? styles.activeLink : styles.navLink
+            }
+            onClick={() => handleNavLinkClick("/Home")}
           >
-            <FaHome style={{ marginRight: '8px' }} />
+            <FaHome style={{ marginRight: "8px" }} />
             Home
           </NavLink>
         </li>
@@ -91,8 +99,10 @@ export default function Navbar() {
           <li className={styles.navItem}>
             <NavLink
               to="/addBatteriCharger"
-              className={({ isActive }) => (isActive ? styles.activeLink : styles.navLink)}
-              onClick={() => handleNavLinkClick('/addBatteriCharger')}
+              className={({ isActive }) =>
+                isActive ? styles.activeLink : styles.navLink
+              }
+              onClick={() => handleNavLinkClick("/addBatteriCharger")}
             >
               Add a batteri charger
             </NavLink>
@@ -104,8 +114,10 @@ export default function Navbar() {
           <li className={styles.navItem}>
             <NavLink
               to="/newChargingStation"
-              className={({ isActive }) => (isActive ? styles.activeLink : styles.navLink)}
-              onClick={() => handleNavLinkClick('/newChargingStation')}
+              className={({ isActive }) =>
+                isActive ? styles.activeLink : styles.navLink
+              }
+              onClick={() => handleNavLinkClick("/newChargingStation")}
             >
               Add my own charging station
             </NavLink>
@@ -116,8 +128,10 @@ export default function Navbar() {
           <li className={styles.navItem}>
             <NavLink
               to="/ActivityHistory"
-              className={({ isActive }) => (isActive ? styles.activeLink : styles.navLink)}
-              onClick={() => handleNavLinkClick('/ActivityHistory')}
+              className={({ isActive }) =>
+                isActive ? styles.activeLink : styles.navLink
+              }
+              onClick={() => handleNavLinkClick("/ActivityHistory")}
             >
               Activity history
             </NavLink>
@@ -127,10 +141,12 @@ export default function Navbar() {
         <li className={styles.navItem}>
           <NavLink
             to="/PersonalArea"
-            className={({ isActive }) => (isActive ? styles.activeLink : styles.navLink)}
-            onClick={() => handleNavLinkClick('/PersonalArea')}
+            className={({ isActive }) =>
+              isActive ? styles.activeLink : styles.navLink
+            }
+            onClick={() => handleNavLinkClick("/PersonalArea")}
           >
-            <FaUser style={{ marginRight: '8px' }} />
+            <FaUser style={{ marginRight: "8px" }} />
             Personal area
           </NavLink>
         </li>
@@ -143,7 +159,7 @@ export default function Navbar() {
             }}
             className={styles.navLink}
           >
-            <MdExitToApp style={{ marginRight: '8px' }} />
+            <MdExitToApp style={{ marginRight: "8px" }} />
             Logout
           </button>
         </li>
