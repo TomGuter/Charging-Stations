@@ -60,6 +60,7 @@ export default function Booking() {
           const data = await response.json();
           const userData = data.user;
           setChargerOwner(userData);
+          console.log("Charger Owner:", userData);
         } catch (error) {
           console.error("Error fetching user by charger ID:", error);
         }
@@ -275,7 +276,7 @@ export default function Booking() {
             userName={
               chargerOwner && chargerOwner.firstName && chargerOwner.lastName
                 ? `${chargerOwner.firstName} ${chargerOwner.lastName}`
-                : "Unknown Owner"
+                : ""
             }
             location={charger.location || "Unknown Location"}
             rating={charger.rating || 0}

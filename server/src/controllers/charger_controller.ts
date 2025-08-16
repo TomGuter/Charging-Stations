@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import ChargingModel from "../models/add_charging_model";
 import BookCharger from "../models/book_a_chrager.model";
+import userModel from "../models/user_model";
 import axios from "axios";
 import fs from "fs";
 import path from "path";
@@ -225,7 +226,15 @@ const getUserByChargerId = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Charging station not found" });
     }
 
-    const user = chargingStation.userId;
+    const userId = chargingStation.userId;
+    if (!userId) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const user = await userModel
+      .findById(userId)
+      .lean();
+
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }

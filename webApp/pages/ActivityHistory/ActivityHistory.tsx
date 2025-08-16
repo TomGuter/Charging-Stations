@@ -13,26 +13,32 @@ import "./ActivityHistory.css";
 import { Booking } from "../../src/types/types";
 import { useNavigate } from "react-router-dom";
 
-
 type Status = "Pending" | "Confirmed" | "Rejected";
 
-const statusStyles: Record<Status, { backgroundColor: string; color: string }> =
-  {
-    Pending: { backgroundColor: "#FFA500", color: "white" },
-    Confirmed: { backgroundColor: "#28a745", color: "white" },
-    Rejected: { backgroundColor: "#dc3545", color: "white" },
-  };
+const statusStyles: Record<Status, { backgroundColor: string; color: string }> = {
+  Pending: { backgroundColor: "#FFA500", color: "white" },
+  Confirmed: { backgroundColor: "#28a745", color: "white" },
+  Rejected: { backgroundColor: "#dc3545", color: "white" },
+};
 
 export default function ActivityHistory() {
   const [rows, setRows] = useState<Booking[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const userId = localStorage.getItem("userId");
-
   const navigate = useNavigate();
 
   useEffect(() => {
+    // require auth
     if (!localStorage.getItem("accessToken")) {
       navigate("/");
+      return;
+    }
+
+    // redirect BatteRi user straight to Home
+    const email = (localStorage.getItem("email") || "").toLowerCase();
+    const isBatteriUser = email === "batteri@gmail.com";
+    if (isBatteriUser) {
+      navigate("/Home", { replace: true });
       return;
     }
 
@@ -62,9 +68,7 @@ export default function ActivityHistory() {
               {
                 method: "GET",
                 headers: {
-                  Authorization: `Bearer ${localStorage.getItem(
-                    "accessToken"
-                  )}`,
+                  Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
                   "Content-Type": "application/json",
                 },
               }
@@ -91,7 +95,7 @@ export default function ActivityHistory() {
     };
 
     fetchBookings();
-  }, [userId]);
+  }, [userId, navigate]);
 
   if (loading) {
     return <Typography>Loading bookings...</Typography>;
@@ -104,14 +108,14 @@ export default function ActivityHistory() {
       </Typography>
       <TableContainer component={Paper} className="table-container">
         <Table stickyHeader>
-        <TableHead style={{ position: "sticky", top: 0 }}>
+          <TableHead style={{ position: "sticky", top: 0 }}>
             <TableRow className="table-header-row">
               <TableCell className="table-header-cell">Date</TableCell>
               <TableCell className="table-header-cell">Start Time</TableCell>
               <TableCell className="table-header-cell">End Time</TableCell>
               <TableCell className="table-header-cell">Location</TableCell>
-              <TableCell className="table-header-cell">Status</TableCell> {}
-              <TableCell className="table-header-cell">Picture</TableCell> {}
+              <TableCell className="table-header-cell">Status</TableCell>
+              <TableCell className="table-header-cell">Picture</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -152,8 +156,7 @@ export default function ActivityHistory() {
                   ) : (
                     <Typography>No Picture Available</Typography>
                   )}
-                </TableCell>{" "}
-                {}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
