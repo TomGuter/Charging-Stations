@@ -94,7 +94,7 @@ export default function Navbar() {
               className={({ isActive }) => (isActive ? styles.activeLink : styles.navLink)}
               onClick={() => handleNavLinkClick('/addBatteriCharger')}
             >
-              Add a battery charger
+              Add a batteri charger
             </NavLink>
           </li>
         )}

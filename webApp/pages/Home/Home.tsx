@@ -114,6 +114,7 @@ export default function Home() {
   } | null>(null);
 
   const [userName, setUserName] = useState<{ firstName: string; lastName: string } | null>(null);
+  const [isBatteriUser, setIsBatteriUser] = useState(false);
 
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
@@ -121,11 +122,17 @@ export default function Home() {
       navigate("/");
       return;
     }
-    const firstName = localStorage.getItem("firstName");
-    const lastName = localStorage.getItem("lastName");
+
+    const email = (localStorage.getItem("email") || "").toLowerCase();
+    const firstName = localStorage.getItem("firstName") || "";
+    const lastName = localStorage.getItem("lastName") || "";
+
     if (firstName && lastName) {
       setUserName({ firstName, lastName });
     }
+
+    const batteri = email === "batteri@gmail.com";
+    setIsBatteriUser(batteri);
 
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -172,12 +179,8 @@ export default function Home() {
           `${import.meta.env.VITE_BACKEND_URL}/carData/get-car-data`,
           {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              userId: userId,
-            }),
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId }),
           }
         );
 
@@ -188,7 +191,6 @@ export default function Home() {
         }
 
         const data = await response.json();
-
         if (data && data.length > 0) {
           setCarData(data[0]);
         } else {
@@ -211,9 +213,7 @@ export default function Home() {
 
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-          address
-        )}`
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`
       );
       const data = await response.json();
 
@@ -268,14 +268,17 @@ export default function Home() {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           {chargingStations.map((charger) => {
-            const isBatteri = charger.chargerType?.toLowerCase() === "batteri";
-            const targetPath = isBatteri ? "/BatteriBooking" : "/Booking";
+            const isBatteriCharger =
+              (charger.chargerType ?? "none").toLowerCase() === "batteri";
+            const targetPath = isBatteriCharger ? "/BatteriBooking" : "/Booking";
+
+            const disableBooking = isBatteriUser && !isBatteriCharger;
 
             return (
               <Marker
                 key={charger._id}
                 position={[charger.latitude, charger.longitude]}
-                icon={isBatteri ? batteriIcon : userLocationIcon}
+                icon={isBatteriCharger ? batteriIcon : userLocationIcon}
               >
                 <Popup>
                   {charger.picture ? (
@@ -322,15 +325,14 @@ export default function Home() {
                         )}
                       </strong>
                       <div>
-                        (based on {carData.brandName} {carData.carModel}{" "}
-                        {carData.year})
+                        (based on {carData.brandName} {carData.carModel} {carData.year})
                       </div>
                     </>
                   ) : (
                     "N/A"
                   )}
                   <br />
-                  {isBatteri && (
+                  {isBatteriCharger && (
                     <div
                       style={{
                         marginTop: "8px",
@@ -341,24 +343,35 @@ export default function Home() {
                         fontWeight: 600,
                       }}
                     >
-                      BatteRi Charger
+                      Batteri Charger
                     </div>
                   )}
                   <button
+                    type="button"
+                    disabled={disableBooking}
+                    aria-disabled={disableBooking}
                     onClick={() => {
+                      if (disableBooking) return; 
                       navigate(targetPath, { state: { charger } });
                     }}
+                    title={
+                      disableBooking
+                        ? "BatteRi user can only book BatteRi chargers"
+                        : ""
+                    }
                     style={{
-                      backgroundColor: "#066C91",
+                      backgroundColor: disableBooking ? "#9aa9b1" : "#066C91",
                       color: "white",
                       padding: "10px 20px",
                       border: "none",
                       borderRadius: "8px",
-                      cursor: "pointer",
+                      cursor: disableBooking ? "not-allowed" : "pointer",
                       marginTop: "10px",
+                      opacity: disableBooking ? 0.85 : 1,
+                      pointerEvents: disableBooking ? "none" : "auto",
                     }}
                   >
-                    Book Now
+                    {disableBooking ? "Not available for a batteri user" : "Book Now"}
                   </button>
                 </Popup>
               </Marker>
