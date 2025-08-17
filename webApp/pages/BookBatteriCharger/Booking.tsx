@@ -64,7 +64,9 @@ export default function Booking() {
         try {
           const accessToken = localStorage.getItem("accessToken");
           const response = await fetch(
-            `${import.meta.env.VITE_BACKEND_URL}/addChargingStation/getUserByChargerId/${charger._id}`,
+            `${
+              import.meta.env.VITE_BACKEND_URL
+            }/addChargingStation/getUserByChargerId/${charger._id}`,
             {
               method: "GET",
               headers: {
@@ -121,7 +123,8 @@ export default function Booking() {
 
     // ---- optional validations only if extra fields were filled ----
     const hasBatteryInputs =
-      formData.currentBatteryLevel !== "" || formData.desiredBatteryLevel !== "";
+      formData.currentBatteryLevel !== "" ||
+      formData.desiredBatteryLevel !== "";
     if (hasBatteryInputs) {
       const pct = (v: string) => Number(v);
       if (
@@ -342,7 +345,7 @@ export default function Booking() {
         {/* Extra optional fields (not required in UI) */}
         <hr className="divider" />
 
-        <div className="form-row">
+        {/* <div className="form-row">
           <div className="form-group">
             <label className="form-label" htmlFor="dateLeave">
               Date Of Leave (optional)
@@ -370,7 +373,7 @@ export default function Booking() {
               className="form-input"
             />
           </div>
-        </div>
+        </div> */}
 
         <div className="form-row">
           <div className="form-group">
@@ -413,15 +416,16 @@ export default function Booking() {
             <label className="form-label" htmlFor="sitePicker">
               Site (optional)
             </label>
-            <input
-              type="text"
+            <select
               id="sitePicker"
               name="sitePicker"
-              placeholder="Midtown TLV -2"
               value={formData.sitePicker}
               onChange={handleChange}
               className="form-input"
-            />
+            >
+              <option value="">Select a site</option>
+              <option value="Midtown TLV -2">Midtown TLV -2</option>
+            </select>
           </div>
 
           <div className="form-group">
@@ -477,15 +481,32 @@ export default function Booking() {
           <label className="form-label" htmlFor="vehicleModel">
             Vehicle Model (optional)
           </label>
-          <input
-            type="text"
+          <select
             id="vehicleModel"
             name="vehicleModel"
-            placeholder="Tesla Model 3"
             value={formData.vehicleModel}
             onChange={handleChange}
             className="form-input"
-          />
+          >
+            <option value="">Select a vehicle model</option>
+            <option value="Tesla Model 3">Tesla Model 3</option>
+            <option value="Tesla Model Y">Tesla Model Y</option>
+            <option value="Tesla Model S">Tesla Model S</option>
+            <option value="Tesla Model X">Tesla Model X</option>
+            <option value="Tesla Cybertruck">Tesla Cybertruck</option>
+            <option value="BMW i4">BMW i4</option>
+            <option value="BMW iX">BMW iX</option>
+            <option value="BMW i7">BMW i7</option>
+            <option value="Mercedes EQS">Mercedes EQS</option>
+            <option value="Mercedes EQE">Mercedes EQE</option>
+            <option value="Audi e-tron">Audi e-tron</option>
+            <option value="Audi e-tron GT">Audi e-tron GT</option>
+            <option value="Porsche Taycan">Porsche Taycan</option>
+            <option value="Volkswagen ID.4">Volkswagen ID.4</option>
+            <option value="Volkswagen ID.3">Volkswagen ID.3</option>
+            <option value="Hyundai IONIQ 5">Hyundai IONIQ 5</option>
+            <option value="Hyundai IONIQ 6">Hyundai IONIQ 6</option>
+          </select>
         </div>
 
         <div className="form-row">
@@ -536,7 +557,7 @@ export default function Booking() {
             />
           </div>
 
-          <div className="form-group">
+          {/* <div className="form-group">
             <label className="form-label" htmlFor="vehicleDriverFullName">
               Full Name (optional)
             </label>
@@ -549,7 +570,7 @@ export default function Booking() {
               onChange={handleChange}
               className="form-input"
             />
-          </div>
+          </div> */}
         </div>
 
         <div className="form-row">
@@ -588,7 +609,7 @@ export default function Booking() {
           </div>
         </div>
 
-        <div className="form-group">
+        {/* <div className="form-group">
           <label className="form-label" htmlFor="note">
             Notes (optional)
           </label>
@@ -599,7 +620,7 @@ export default function Booking() {
             onChange={handleChange}
             className="form-textarea"
           />
-        </div>
+        </div> */}
 
         {error && <p className="error">{error}</p>}
         {successMessage && <p className="success">{successMessage}</p>}

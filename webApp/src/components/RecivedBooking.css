@@ -179,6 +179,7 @@ h3 {
   overflow: hidden;
   min-height: 0;
   position: relative;
+  width: 100%;
 }
 .action-buttons {
   white-space: nowrap;
@@ -188,23 +189,23 @@ h3 {
   width: 100%;
   max-width: 100%;
   border-collapse: collapse;
-  margin-top: 20px;
   table-layout: auto;
   overflow-x: auto;
   box-sizing: border-box;
+  max-height: 500px;
 }
 
 .booking-table thead {
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 10;
   background-color: #ffffff;
 }
 
 .booking-table tbody {
   display: block;
   overflow-y: auto;
-  height: calc(100vh - 250px);
+  height: 500px;
 }
 
 .booking-table thead tr,
@@ -256,7 +257,7 @@ h3 {
 }
 
 .status-confirmed {
-  color: #000000;
+  margin-top: 10px;
 }
 
 .status-rejected {
@@ -264,7 +265,8 @@ h3 {
 }
 
 .status-pending {
-  color: #000000;
+  margin-top: 30px;
+  align-items: center;
 }
 
 .action-buttons {
