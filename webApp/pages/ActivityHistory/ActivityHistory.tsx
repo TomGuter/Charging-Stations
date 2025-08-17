@@ -1,13 +1,5 @@
 import { useEffect, useState } from "react";
 import { Typography, Box } from "@mui/material";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "../../src/components/ui/table";
 import { Booking } from "../../src/types/types";
 import { useNavigate } from "react-router-dom";
 import "./ActivityHistory.css";
@@ -120,59 +112,57 @@ export default function ActivityHistory() {
       </Typography>
 
       <div className="table-wrapper">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Date</TableHead>
-              <TableHead>Start Time</TableHead>
-              <TableHead>End Time</TableHead>
-              <TableHead>Location</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Station Picture</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Start Time</th>
+              <th>End Time</th>
+              <th>Location</th>
+              <th>Status</th>
+              <th>Station Picture</th>
+            </tr>
+          </thead>
+          <tbody>
             {rows.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={6} className="empty-state">
+              <tr>
+                <td colSpan={6} className="empty-state">
                   <Typography variant="h6" color="textSecondary">
                     No bookings found
                   </Typography>
-                </TableCell>
-              </TableRow>
+                </td>
+              </tr>
             ) : (
               rows.map((row) => {
                 console.log("Rendering row:", row._id, "with data:", row);
                 return (
-                  <TableRow key={row._id}>
-                    <TableCell>
-                      {new Date(row.Date).toLocaleDateString("he-IL")}
-                    </TableCell>
-                    <TableCell>
+                  <tr key={row._id}>
+                    <td>{new Date(row.Date).toLocaleDateString("he-IL")}</td>
+                    <td>
                       {new Date(row.StartTime).toLocaleTimeString("he-IL", {
                         hour: "2-digit",
                         minute: "2-digit",
                       })}
-                    </TableCell>
-                    <TableCell>
+                    </td>
+                    <td>
                       {new Date(row.EndTime).toLocaleTimeString("he-IL", {
                         hour: "2-digit",
                         minute: "2-digit",
                       })}
-                    </TableCell>
-                    <TableCell>
+                    </td>
+                    <td>
                       <div className="location-cell" title={row.Location}>
                         {row.Location}
                       </div>
-                    </TableCell>
-                    <TableCell>
+                    </td>
+                    <td>
                       <span
                         className={`status-badge status-${row.Status.toLowerCase()}`}
                       >
                         {row.Status}
                       </span>
-                    </TableCell>
-                    <TableCell>
+                    </td>
+                    <td>
                       {row.chargerPicture ? (
                         <img
                           src={`${import.meta.env.VITE_BACKEND_URL}${
@@ -186,13 +176,13 @@ export default function ActivityHistory() {
                           <span>No Image</span>
                         </div>
                       )}
-                    </TableCell>
-                  </TableRow>
+                    </td>
+                  </tr>
                 );
               })
             )}
-          </TableBody>
-        </Table>
+          </tbody>
+        </table>
       </div>
     </div>
   );

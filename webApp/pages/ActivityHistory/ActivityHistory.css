@@ -9,19 +9,18 @@
   margin-bottom: 200px;
   text-align: center !important;
   font-weight: bold !important;
-  color: #333 !important;
-  font-size: 28px !important;
+  color: rgb(0, 0, 0) !important;
+  font-size: 36px !important;
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 4px;
   position: relative;
   padding: 20px 40px;
   background: none !important;
-  color: rgb(0, 0, 0) !important;
   text-shadow: #ffffff !important;
   border-radius: 15px;
-  display: inline-block;
-  left: 50%;
-  transform: translateX(-50%);
+  display: block;
+  width: 100%;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
 }
 
 .table-wrapper {
