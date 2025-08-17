@@ -1,25 +1,8 @@
 import { useEffect, useState } from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Typography,
-} from "@mui/material";
-import "./ActivityHistory.css";
+import { Typography, Box } from "@mui/material";
 import { Booking } from "../../src/types/types";
 import { useNavigate } from "react-router-dom";
-
-type Status = "Pending" | "Confirmed" | "Rejected";
-
-const statusStyles: Record<Status, { backgroundColor: string; color: string }> = {
-  Pending: { backgroundColor: "#FFA500", color: "white" },
-  Confirmed: { backgroundColor: "#28a745", color: "white" },
-  Rejected: { backgroundColor: "#dc3545", color: "white" },
-};
+import "./ActivityHistory.css";
 
 export default function ActivityHistory() {
   const [rows, setRows] = useState<Booking[]>([]);
@@ -45,7 +28,9 @@ export default function ActivityHistory() {
     const fetchBookings = async () => {
       try {
         const response = await fetch(
-          `${import.meta.env.VITE_BACKEND_URL}/bookings/getBookingByUserId/${userId}`,
+          `${
+            import.meta.env.VITE_BACKEND_URL
+          }/bookings/getBookingByUserId/${userId}`,
           {
             method: "GET",
             headers: {
@@ -60,15 +45,22 @@ export default function ActivityHistory() {
         }
 
         const data = await response.json();
+        console.log("Raw bookings data:", data);
+        console.log("Number of bookings:", data.length);
 
         const updatedBookings = await Promise.all(
           data.map(async (booking: Booking) => {
+            console.log("Processing booking:", booking._id);
             const chargerResponse = await fetch(
-              `${import.meta.env.VITE_BACKEND_URL}/addChargingStation/getChargerById/${booking.chargerId}`,
+              `${
+                import.meta.env.VITE_BACKEND_URL
+              }/addChargingStation/getChargerById/${booking.chargerId}`,
               {
                 method: "GET",
                 headers: {
-                  Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+                  Authorization: `Bearer ${localStorage.getItem(
+                    "accessToken"
+                  )}`,
                   "Content-Type": "application/json",
                 },
               }
@@ -86,6 +78,7 @@ export default function ActivityHistory() {
           })
         );
 
+        console.log("Final processed bookings:", updatedBookings);
         setRows(updatedBookings);
         setLoading(false);
       } catch (error) {
@@ -98,70 +91,99 @@ export default function ActivityHistory() {
   }, [userId, navigate]);
 
   if (loading) {
-    return <Typography>Loading bookings...</Typography>;
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="200px"
+      >
+        <Typography variant="h6">Loading bookings...</Typography>
+      </Box>
+    );
   }
+
+  console.log("Rendering with rows:", rows.length, "bookings:", rows);
 
   return (
     <div className="activity-history-container">
       <Typography variant="h5" className="table-title">
-        Activity History
+        Activity History ({rows.length} bookings)
       </Typography>
-      <TableContainer component={Paper} className="table-container">
-        <Table stickyHeader>
-          <TableHead style={{ position: "sticky", top: 0 }}>
-            <TableRow className="table-header-row">
-              <TableCell className="table-header-cell">Date</TableCell>
-              <TableCell className="table-header-cell">Start Time</TableCell>
-              <TableCell className="table-header-cell">End Time</TableCell>
-              <TableCell className="table-header-cell">Location</TableCell>
-              <TableCell className="table-header-cell">Status</TableCell>
-              <TableCell className="table-header-cell">Picture</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map((row) => (
-              <TableRow key={row._id} className="table-row">
-                <TableCell className="table-cell">
-                  {new Date(row.Date).toLocaleDateString()}
-                </TableCell>
-                <TableCell className="table-cell">
-                  {new Date(row.StartTime).toLocaleTimeString()}
-                </TableCell>
-                <TableCell className="table-cell">
-                  {new Date(row.EndTime).toLocaleTimeString()}
-                </TableCell>
-                <TableCell className="table-cell">{row.Location}</TableCell>
-                <TableCell
-                  className="table-cell"
-                  style={statusStyles[row.Status as Status] || {}}
-                >
-                  {row.Status}
-                </TableCell>
-                <TableCell className="table-cell">
-                  {row.chargerPicture ? (
-                    <img
-                      src={
-                        row.chargerPicture
-                          ? `${import.meta.env.VITE_BACKEND_URL}${row.chargerPicture}`
-                          : "defaultPicture"
-                      }
-                      alt="Charging Station"
-                      style={{
-                        width: "100px",
-                        height: "139px",
-                        objectFit: "cover",
-                        borderRadius: "8px",
-                      }}
-                    />
-                  ) : (
-                    <Typography>No Picture Available</Typography>
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+
+      <div className="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Start Time</th>
+              <th>End Time</th>
+              <th>Location</th>
+              <th>Status</th>
+              <th>Station Picture</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="empty-state">
+                  <Typography variant="h6" color="textSecondary">
+                    No bookings found
+                  </Typography>
+                </td>
+              </tr>
+            ) : (
+              rows.map((row) => {
+                console.log("Rendering row:", row._id, "with data:", row);
+                return (
+                  <tr key={row._id}>
+                    <td>{new Date(row.Date).toLocaleDateString("he-IL")}</td>
+                    <td>
+                      {new Date(row.StartTime).toLocaleTimeString("he-IL", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </td>
+                    <td>
+                      {new Date(row.EndTime).toLocaleTimeString("he-IL", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </td>
+                    <td>
+                      <div className="location-cell" title={row.Location}>
+                        {row.Location}
+                      </div>
+                    </td>
+                    <td>
+                      <span
+                        className={`status-badge status-${row.Status.toLowerCase()}`}
+                      >
+                        {row.Status}
+                      </span>
+                    </td>
+                    <td>
+                      {row.chargerPicture ? (
+                        <img
+                          src={`${import.meta.env.VITE_BACKEND_URL}${
+                            row.chargerPicture
+                          }`}
+                          alt="Charging Station"
+                          className="station-image"
+                        />
+                      ) : (
+                        <div className="no-image-placeholder">
+                          <span>No Image</span>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
