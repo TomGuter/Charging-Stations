@@ -50,5 +50,6 @@
   },
   "devDependencies": {
     "@types/leaflet-routing-machine": "^3.2.8"
-  }
+  },
+  "packageManager": "npm@9.0.0"
 }
