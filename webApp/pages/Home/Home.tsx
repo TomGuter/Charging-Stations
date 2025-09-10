@@ -116,10 +116,13 @@ function DirectionsControl({
         L.latLng(destination.lat, destination.lng),
       ],
       addWaypoints: false,
-      draggableWaypoints: false,
       fitSelectedRoutes: true,
       show: false,
-      lineOptions: { styles: [{ color: "#066C91", weight: 6 }] },
+      lineOptions: {
+        styles: [{ color: "#066C91", weight: 6 }],
+        extendToWaypoints: false,
+        missingRouteTolerance: 10,
+      },
       router: L.Routing.osrmv1({
         serviceUrl: "https://router.project-osrm.org/route/v1",
       }),
@@ -153,7 +156,10 @@ function DirectionsControl({
   return null;
 }
 
-function calculateChargingTime(batteryCapacity: number, chargingSpeed: number): string {
+function calculateChargingTime(
+  batteryCapacity: number,
+  chargingSpeed: number
+): string {
   if (!batteryCapacity || !chargingSpeed) return "N/A";
   const timeInHours = batteryCapacity / chargingSpeed;
   const hours = Math.floor(timeInHours);
@@ -174,21 +180,35 @@ export default function Home() {
   const location = useLocation();
   const message = (location as any).state?.message;
 
-  const [coordinates, setCoordinates] = useState<{ lat: number; lng: number } | null>(null);
-  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [coordinates, setCoordinates] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
+  const [userLocation, setUserLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
   const [address, setAddress] = useState<string>("");
-  const [chargingStations, setChargingStations] = useState<ChargingStation[]>([]);
+  const [chargingStations, setChargingStations] = useState<ChargingStation[]>(
+    []
+  );
   const [carData, setCarData] = useState<{
     batteryCapacity: number;
     brandName: string;
     year: number;
     carModel: string;
   } | null>(null);
-  const [userName, setUserName] = useState<{ firstName: string; lastName: string } | null>(null);
+  const [userName, setUserName] = useState<{
+    firstName: string;
+    lastName: string;
+  } | null>(null);
   const [isBatteriUser, setIsBatteriUser] = useState(false);
 
   // NEW: routing state
-  const [routeDest, setRouteDest] = useState<{ lat: number; lng: number } | null>(null);
+  const [routeDest, setRouteDest] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
   const [routeSummary, setRouteSummary] = useState<RouteSummary>(null);
   const [routeLoading, setRouteLoading] = useState(false);
 
@@ -225,7 +245,9 @@ export default function Home() {
     const fetchChargingStations = async () => {
       try {
         const response = await fetch(
-          `${import.meta.env.VITE_BACKEND_URL}/addChargingStation/getAllChargers`
+          `${
+            import.meta.env.VITE_BACKEND_URL
+          }/addChargingStation/getAllChargers`
         );
         const data = await response.json();
         if (data.chargers) setChargingStations(data.chargers);
@@ -278,7 +300,9 @@ export default function Home() {
 
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+          address
+        )}`
       );
       const data = await response.json();
 
@@ -327,7 +351,12 @@ export default function Home() {
           }
           zoom={14}
           scrollWheelZoom={false}
-          style={{ width: "100%", height: "600px", borderRadius: "10px", position: "relative" }}
+          style={{
+            width: "100%",
+            height: "600px",
+            borderRadius: "10px",
+            position: "relative",
+          }}
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -398,7 +427,9 @@ export default function Home() {
           {chargingStations.map((charger) => {
             const isBatteriCharger =
               (charger.chargerType ?? "none").toLowerCase() === "batteri";
-            const targetPath = isBatteriCharger ? "/BatteriBooking" : "/Booking";
+            const targetPath = isBatteriCharger
+              ? "/BatteriBooking"
+              : "/Booking";
             const disableBooking = isBatteriUser && !isBatteriCharger;
 
             return (
@@ -410,7 +441,9 @@ export default function Home() {
                 <Popup>
                   {charger.picture ? (
                     <img
-                      src={`${import.meta.env.VITE_BACKEND_URL}${charger.picture}`}
+                      src={`${import.meta.env.VITE_BACKEND_URL}${
+                        charger.picture
+                      }`}
                       alt="Charging Station"
                       style={{
                         width: "100%",
@@ -422,7 +455,9 @@ export default function Home() {
                     />
                   ) : (
                     <img
-                      src={`${import.meta.env.VITE_BACKEND_URL}/uploads/default_charger.png`}
+                      src={`${
+                        import.meta.env.VITE_BACKEND_URL
+                      }/uploads/default_charger.png`}
                       alt="Charging Station"
                       style={{
                         width: "100%",
@@ -450,7 +485,8 @@ export default function Home() {
                         )}
                       </strong>
                       <div>
-                        (based on {carData.brandName} {carData.carModel} {carData.year})
+                        (based on {carData.brandName} {carData.carModel}{" "}
+                        {carData.year})
                       </div>
                     </>
                   ) : (
@@ -471,12 +507,14 @@ export default function Home() {
                       Batteri Charger
                     </div>
                   )}
-
                   {/* Show route from user's location to this charger */}
                   <button
                     type="button"
                     onClick={() => {
-                      setRouteDest({ lat: charger.latitude, lng: charger.longitude });
+                      setRouteDest({
+                        lat: charger.latitude,
+                        lng: charger.longitude,
+                      });
                       setRouteSummary(null);
                       setRouteLoading(true);
                     }}
@@ -494,7 +532,6 @@ export default function Home() {
                   >
                     Route from my location
                   </button>
-
                   <button
                     type="button"
                     disabled={disableBooking}
@@ -504,7 +541,9 @@ export default function Home() {
                       navigate(targetPath, { state: { charger } });
                     }}
                     title={
-                      disableBooking ? "BatteRi user can only book BatteRi chargers" : ""
+                      disableBooking
+                        ? "BatteRi user can only book BatteRi chargers"
+                        : ""
                     }
                     style={{
                       backgroundColor: disableBooking ? "#9aa9b1" : "#066C91",
@@ -518,7 +557,9 @@ export default function Home() {
                       pointerEvents: disableBooking ? "none" : "auto",
                     }}
                   >
-                    {disableBooking ? "Not available for a batteri user" : "Book Now"}
+                    {disableBooking
+                      ? "Not available for a batteri user"
+                      : "Book Now"}
                   </button>
                 </Popup>
               </Marker>
